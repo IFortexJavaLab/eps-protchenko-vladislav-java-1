@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS courses
     duration         INT            NOT NULL,
     start_date       TIMESTAMP      NOT NULL,
     last_update_date TIMESTAMP      NOT NULL,
-    is_open          BOOLEAN DEFAULT FALSE
+    is_open          BOOLEAN        NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS m2m_student_course
