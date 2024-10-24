@@ -13,6 +13,3 @@ services:
       POSTGRES_DBINIT_ARGS: "--encoding=UTF8 --locale=en_US.UTF8"
     volumes:
       - ./db-init:/docker-entrypoint-initdb.d
-
-    
-  
