@@ -2,12 +2,14 @@ package com.ifortex.internship.configuration;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import javax.sql.DataSource;
+
 import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class DataSourceConfiguration {
@@ -15,7 +17,6 @@ public class DataSourceConfiguration {
     @Bean
     public DataSource dataSource(Environment env) {
         HikariConfig config = new HikariConfig();
-        System.out.println(config.getMaximumPoolSize());
         config.setJdbcUrl(env.getProperty("datasource.url"));
         config.setUsername(env.getProperty("datasource.username"));
         config.setPassword(env.getProperty("datasource.password"));
