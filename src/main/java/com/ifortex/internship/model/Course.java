@@ -15,13 +15,13 @@ import java.util.Set;
 @Builder
 public class Course {
 
-    private int id;
-    private String name;
-    private String description;
-    private BigDecimal price;
-    private int duration;
-    private LocalDateTime startDate;
-    private LocalDateTime lastUpdateDate;
-    private boolean isOpen;
-    private Set<Student> students;
+  private int id;
+  private String name;
+  private String description;
+  private BigDecimal price;
+  private int duration;
+  private LocalDateTime startDate;
+  private LocalDateTime lastUpdateDate;
+  private boolean isOpen;
+  private Set<Student> students;
 }

@@ -8,10 +8,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @EnableWebMvc
 @ComponentScan("com.ifortex.internship")
-@PropertySource(value = {"classpath:application-${envTarget:dev}.yml"}, factory = YamlPropertySourceFactory.class)
-public class ApplicationConfiguration {
-
-    
-
-}
-
+@PropertySource(
+    value = {"classpath:application-${envTarget:dev}.yml"},
+    factory = YamlPropertySourceFactory.class)
+public class ApplicationConfiguration {}

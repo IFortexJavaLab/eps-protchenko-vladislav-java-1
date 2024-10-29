@@ -12,14 +12,14 @@ import java.util.Properties;
 
 public class YamlPropertySourceFactory implements PropertySourceFactory {
 
-    @Override
-    public PropertySource<?> createPropertySource(String name, EncodedResource resource) throws IOException {
-        YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
-        factory.setResources(resource.getResource());
-        Properties properties = factory.getObject();
-        return new PropertiesPropertySource(
-                Objects.requireNonNull(resource.getResource().getFilename()),
-                Objects.requireNonNull(properties)
-        );
-    }
+  @Override
+  public PropertySource<?> createPropertySource(String name, EncodedResource resource)
+      throws IOException {
+    YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
+    factory.setResources(resource.getResource());
+    Properties properties = factory.getObject();
+    return new PropertiesPropertySource(
+        Objects.requireNonNull(resource.getResource().getFilename()),
+        Objects.requireNonNull(properties));
+  }
 }
