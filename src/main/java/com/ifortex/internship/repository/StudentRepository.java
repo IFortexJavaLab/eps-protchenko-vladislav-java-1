@@ -4,6 +4,7 @@ import com.ifortex.internship.model.Student;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface StudentRepository {
 
@@ -11,7 +12,7 @@ public interface StudentRepository {
 
   List<Student> findAll();
 
-  List<Student> findByCourseId(int courseId);
+  Set<Student> findByCourseId(int courseId);
 
   void save(Student student);
 

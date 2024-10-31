@@ -2,8 +2,10 @@ package com.ifortex.internship.repository.impl;
 
 import com.ifortex.internship.model.Student;
 import com.ifortex.internship.repository.StudentRepository;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -31,10 +33,10 @@ public class JdbcStudentRepository implements StudentRepository {
   }
 
   @Override
-  public List<Student> findByCourseId(int courseId) {
+  public Set<Student> findByCourseId(int courseId) {
     String sql =
-        "SELECT * FROM students WHERE id IN (SELECT student_id FROM m2m_student_course WHERE course_id = ?)";
-    return jdbcTemplate.query(sql, studentRowMapper, courseId);
+        "SELECT * FROM students s JOIN public.m2m_student_course m on s.id = m.student_id WHERE course_id = ?";
+    return new HashSet<>(jdbcTemplate.query(sql, studentRowMapper, courseId));
   }
 
   @Override
