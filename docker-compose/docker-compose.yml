@@ -12,4 +12,8 @@ services:
       POSTGRES_DB: education_db
       POSTGRES_DBINIT_ARGS: "--encoding=UTF8 --locale=en_US.UTF8"
     volumes:
-      - ./db-init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    driver: local
