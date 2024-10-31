@@ -7,11 +7,15 @@ import java.util.Optional;
 
 public interface StudentRepository {
 
-    Optional<Student> findById(int id);
-    List<Student> findAll();
-    List<Student> findByCourseId(int courseId);
-    void save(Student student);
-    void update(Student student);
-    void delete(int id);
+  Optional<Student> findById(int id);
 
+  List<Student> findAll();
+
+  List<Student> findByCourseId(int courseId);
+
+  void save(Student student);
+
+  void update(Student student);
+
+  void delete(int id);
 }
