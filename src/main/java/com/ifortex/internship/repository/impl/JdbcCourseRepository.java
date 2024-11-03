@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class JdbcCourseRepository implements CourseRepository {
 
   private final JdbcTemplate jdbcTemplate;
-
+  
   private final StudentRepository studentRepository;
 
   private final DateTimeFormatter dateTimeFormatter =
@@ -43,10 +43,12 @@ public class JdbcCourseRepository implements CourseRepository {
 
   @Override
   public Optional<Course> findById(int id, boolean includeStudents) {
+    // TODO: Get everything within single query
     String sql = "SELECT * FROM courses WHERE id = ?";
     Course course =
         jdbcTemplate.query(sql, courseRowMapper, id).stream()
             .findFirst()
+                // TODO: remove exception
             .orElseThrow(EntityNotFoundException::new);
     if (includeStudents) {
       course.setStudents(studentRepository.findByCourseId(course.getId()));
