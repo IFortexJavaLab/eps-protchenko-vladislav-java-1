@@ -7,11 +7,9 @@ import java.util.Optional;
 
 public interface CourseRepository {
 
-  Optional<Course> findById(int id, boolean includeStudents);
+  Optional<Course> findById(int id);
 
-  List<Course> findAll(boolean includeStudents);
-
-  List<Course> findByStudentId(int id, boolean includeStudents);
+  List<Course> findAll();
 
   void save(Course course);
 

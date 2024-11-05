@@ -1,18 +1,16 @@
 package com.ifortex.internship.repository.impl;
 
-import com.ifortex.internship.exception.EntityNotFoundException;
 import com.ifortex.internship.model.Course;
+import com.ifortex.internship.model.Student;
 import com.ifortex.internship.repository.CourseRepository;
-import com.ifortex.internship.repository.StudentRepository;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,57 +18,44 @@ import org.springframework.stereotype.Component;
 public class JdbcCourseRepository implements CourseRepository {
 
   private final JdbcTemplate jdbcTemplate;
-  
-  private final StudentRepository studentRepository;
 
   private final DateTimeFormatter dateTimeFormatter =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
 
-  private final RowMapper<Course> courseRowMapper =
-      ((rs, rowNum) ->
-          Course.builder()
-              .id(rs.getInt("id"))
-              .name(rs.getString("name"))
-              .description(rs.getString("description"))
-              .price(new BigDecimal(rs.getString("price")))
-              .duration(rs.getInt("duration"))
-              .startDate(LocalDateTime.parse(rs.getString("start_date"), dateTimeFormatter))
-              .lastUpdateDate(
-                  LocalDateTime.parse(rs.getString("last_update_date"), dateTimeFormatter))
-              .isOpen(rs.getBoolean("is_open"))
-              .students(new HashSet<>())
-              .build());
+  private final CourseWithStudentExtractor courseWithStudentExtractor;
 
   @Override
-  public Optional<Course> findById(int id, boolean includeStudents) {
-    // TODO: Get everything within single query
-    String sql = "SELECT * FROM courses WHERE id = ?";
-    Course course =
-        jdbcTemplate.query(sql, courseRowMapper, id).stream()
-            .findFirst()
-                // TODO: remove exception
-            .orElseThrow(EntityNotFoundException::new);
-    if (includeStudents) {
-      course.setStudents(studentRepository.findByCourseId(course.getId()));
-    }
-    return Optional.ofNullable(course);
-  }
-
-  @Override
-  public List<Course> findAll(boolean includeStudents) {
-    String sql = "SELECT * FROM courses";
-    List<Course> courseList = jdbcTemplate.query(sql, courseRowMapper);
-    if (includeStudents) {
-      courseList.forEach(c -> c.setStudents(studentRepository.findByCourseId(c.getId())));
-    }
-    return courseList;
-  }
-
-  @Override
-  public List<Course> findByStudentId(int studentId, boolean includeStudents) {
+  public Optional<Course> findById(int id) {
     String sql =
-        "SELECT * FROM courses c JOIN public.m2m_student_course m on c.id = m.course_id WHERE student_id = ?";
-    return jdbcTemplate.query(sql, courseRowMapper, studentId);
+        """
+        SELECT c.id as course_id, c.name as course_name, c.description as course_description,
+               c.price as course_price, c.duration as course_duration,
+               c.start_date as course_start_date, c.last_update_date as course_last_update_date,
+               c.is_open as course_is_open,
+               s.id as student_id, s.name as student_name
+        FROM courses c
+        LEFT JOIN m2m_student_course m ON c.id = m.course_id
+        LEFT JOIN students s ON m.student_id = s.id
+        WHERE c.id = ?
+        """;
+    List<Course> courses = jdbcTemplate.query(sql, courseWithStudentExtractor, id);
+    return courses.stream().findFirst();
+  }
+
+  @Override
+  public List<Course> findAll() {
+    String sql =
+        """
+        SELECT c.id as course_id, c.name as course_name, c.description as course_description,
+               c.price as course_price, c.duration as course_duration,
+               c.start_date as course_start_date, c.last_update_date as course_last_update_date,
+               c.is_open as course_is_open,
+               s.id as student_id, s.name as student_name
+        FROM courses c
+        LEFT JOIN m2m_student_course m ON c.id = m.course_id
+        LEFT JOIN students s ON m.student_id = s.id
+        """;
+    return jdbcTemplate.query(sql, courseWithStudentExtractor);
   }
 
   @Override
@@ -93,6 +78,14 @@ public class JdbcCourseRepository implements CourseRepository {
 
   private void saveCourseStudents(Course course) {
     String sql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
+    jdbcTemplate.batchUpdate(
+        sql,
+        course.getStudents(),
+        course.getStudents().size(),
+        (ps, student) -> {
+          ps.setInt(1, course.getId());
+          ps.setInt(2, student.getId());
+        });
     course.getStudents().forEach(s -> jdbcTemplate.update(sql, course.getId(), s.getId()));
   }
 
@@ -119,11 +112,42 @@ public class JdbcCourseRepository implements CourseRepository {
         course.getLastUpdateDate(),
         course.isOpen(),
         course.getId());
+    updateCourseStudents(course);
   }
 
   private void updateCourseStudents(Course course) {
-    String deleteSql = "DELETE FROM m2m_student_course WHERE course_id = ?";
-    jdbcTemplate.update(deleteSql, course.getId());
-    saveCourseStudents(course);
+    String selectSql = "SELECT student_id FROM m2m_student_course WHERE course_id = ?";
+    Set<Integer> existingStudentIds =
+        new HashSet<>(
+            jdbcTemplate.query(selectSql, (rs, rowNum) -> rs.getInt("student_id"), course.getId()));
+
+    Set<Integer> newStudentIds =
+        course.getStudents().stream().map(Student::getId).collect(Collectors.toSet());
+
+    Set<Integer> studentsToAdd = new HashSet<>(existingStudentIds);
+    studentsToAdd.removeAll(existingStudentIds);
+
+    Set<Integer> studentsToRemove = new HashSet<>(newStudentIds);
+    studentsToAdd.removeAll(newStudentIds);
+
+    String insertSql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
+    jdbcTemplate.batchUpdate(
+        insertSql,
+        studentsToAdd,
+        studentsToAdd.size(),
+        (ps, studentId) -> {
+          ps.setInt(1, course.getId());
+          ps.setInt(2, studentId);
+        });
+
+    String deleteSql = "DELETE FROM m2m_student_course WHERE course_id = ? AND student_id = ?";
+    jdbcTemplate.batchUpdate(
+        deleteSql,
+        studentsToRemove,
+        studentsToRemove.size(),
+        (ps, studentId) -> {
+          ps.setInt(1, course.getId());
+          ps.setInt(2, studentId);
+        });
   }
 }
