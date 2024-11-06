@@ -6,17 +6,51 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/** Repository interface for managing Student entities. */
 public interface StudentRepository {
 
+  /**
+   * Finds a student by their unique identifier.
+   *
+   * @param id the unique identifier of the student
+   * @return an {@link Optional} containing the found student, or an empty Optional if no student is
+   *     found
+   */
   Optional<Student> findById(int id);
 
+  /**
+   * Retrieves all students.
+   *
+   * @return a list of all students
+   */
   List<Student> findAll();
 
+  /**
+   * Retrieves all students associated with a specific course.
+   *
+   * @param courseId the unique identifier of the course
+   * @return a set of students enrolled in the specified course
+   */
   Set<Student> findByCourseId(int courseId);
 
-  void save(Student student);
+  /**
+   * Creates a new student in the repository.
+   *
+   * @param student the student to be saved
+   */
+  void create(Student student);
 
+  /**
+   * Updates an existing student's information in the repository.
+   *
+   * @param student the student with updated information
+   */
   void update(Student student);
 
+  /**
+   * Deletes a student by their unique identifier.
+   *
+   * @param id the unique identifier of the student to be deleted
+   */
   void delete(int id);
 }
