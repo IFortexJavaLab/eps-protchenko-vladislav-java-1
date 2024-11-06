@@ -3,6 +3,7 @@ package com.ifortex.internship.repository.impl;
 import com.ifortex.internship.model.Course;
 import com.ifortex.internship.model.Student;
 import com.ifortex.internship.repository.CourseRepository;
+import com.ifortex.internship.repository.utils.CourseWithStudentExtractor;
 import java.sql.PreparedStatement;
 import java.util.HashSet;
 import java.util.List;
