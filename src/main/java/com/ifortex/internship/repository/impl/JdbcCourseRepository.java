@@ -5,11 +5,10 @@ import com.ifortex.internship.model.Student;
 import com.ifortex.internship.repository.CourseRepository;
 import com.ifortex.internship.repository.utils.CourseWithStudentExtractor;
 import java.sql.PreparedStatement;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -49,7 +48,7 @@ public class JdbcCourseRepository implements CourseRepository {
   }
 
   @Override
-  public void create(Course course) {
+  public int create(Course course) {
     KeyHolder keyHolder = new GeneratedKeyHolder();
     String sql =
         "INSERT INTO courses (name, description, price, duration, start_date, last_update_date, is_open) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -66,13 +65,12 @@ public class JdbcCourseRepository implements CourseRepository {
           return ps;
         },
         keyHolder);
-    course.setId(keyHolder.getKey().intValue());
-    saveCourseStudents(
-        course.getId(),
-        course.getStudents().stream().map(Student::getId).collect(Collectors.toSet()));
+    int courseId = keyHolder.getKey().intValue();
+    saveCourseStudents(courseId, course.getStudents().stream().map(Student::getId).toList());
+    return courseId;
   }
 
-  private void saveCourseStudents(int courseId, Set<Integer> studentIds) {
+  private void saveCourseStudents(int courseId, List<Integer> studentIds) {
     String sql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
     jdbcTemplate.batchUpdate(
         sql,
@@ -85,63 +83,52 @@ public class JdbcCourseRepository implements CourseRepository {
   }
 
   @Override
+  public void update(int courseId, Map<String, Object> fields) {
+    StringBuilder sqlBuilder = new StringBuilder("UPDATE courses SET ");
+    List<Object> values = new ArrayList<>();
+
+    fields.forEach(
+        (key, value) -> {
+          sqlBuilder.append(key).append(" = ?, ");
+          values.add(value);
+        });
+
+    sqlBuilder.setLength(sqlBuilder.length() - 2);
+    sqlBuilder.append(" WHERE id = ?");
+    values.add(courseId);
+
+    jdbcTemplate.update(sqlBuilder.toString(), values.toArray());
+  }
+
+  @Override
+  public void updateCourseStudents(Course course, List<Integer> newStudentIds) {
+    String deleteSql = "DELETE FROM m2m_student_course WHERE course_id = ? AND student_id = ?";
+    jdbcTemplate.batchUpdate(
+        deleteSql,
+        course.getStudents(),
+        course.getStudents().size(),
+        (ps, student) -> {
+          ps.setInt(1, course.getId());
+          ps.setInt(2, student.getId());
+        });
+
+    String insertSql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
+    jdbcTemplate.batchUpdate(
+        insertSql,
+        newStudentIds,
+        newStudentIds.size(),
+        (ps, studentId) -> {
+          ps.setInt(1, course.getId());
+          ps.setInt(2, studentId);
+        });
+  }
+
+  @Override
   public void delete(int courseId) {
     String deleteAssociationsSql = "DELETE FROM m2m_student_course WHERE course_id = ?";
     jdbcTemplate.update(deleteAssociationsSql, courseId);
 
     String deleteCourseSql = "DELETE FROM courses WHERE id = ?";
     jdbcTemplate.update(deleteCourseSql, courseId);
-  }
-
-  @Override
-  public void update(Course course) {
-    String sql =
-        "UPDATE courses SET name = ?, description = ?, price = ?, duration = ?, start_date = ?, last_update_date = ?, is_open = ? WHERE id = ?";
-    jdbcTemplate.update(
-        sql,
-        course.getName(),
-        course.getDescription(),
-        course.getPrice(),
-        course.getDuration(),
-        course.getStartDate(),
-        course.getLastUpdateDate(),
-        course.isOpen(),
-        course.getId());
-    updateCourseStudents(
-        course.getId(),
-        course.getStudents().stream().map(Student::getId).collect(Collectors.toSet()));
-  }
-
-  private void updateCourseStudents(int courseId, Set<Integer> newStudentIds) {
-    String selectSql = "SELECT student_id FROM m2m_student_course WHERE course_id = ?";
-    Set<Integer> existingStudentIds =
-        new HashSet<>(
-            jdbcTemplate.query(selectSql, (rs, rowNum) -> rs.getInt("student_id"), courseId));
-
-    Set<Integer> studentsToAdd = new HashSet<>(newStudentIds);
-    studentsToAdd.removeAll(existingStudentIds);
-
-    Set<Integer> studentsToRemove = new HashSet<>(existingStudentIds);
-    studentsToRemove.removeAll(newStudentIds);
-
-    String insertSql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
-    jdbcTemplate.batchUpdate(
-        insertSql,
-        studentsToAdd,
-        studentsToAdd.size(),
-        (ps, studentId) -> {
-          ps.setInt(1, courseId);
-          ps.setInt(2, studentId);
-        });
-
-    String deleteSql = "DELETE FROM m2m_student_course WHERE course_id = ? AND student_id = ?";
-    jdbcTemplate.batchUpdate(
-        deleteSql,
-        studentsToRemove,
-        studentsToRemove.size(),
-        (ps, studentId) -> {
-          ps.setInt(1, courseId);
-          ps.setInt(2, studentId);
-        });
   }
 }

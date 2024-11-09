@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/** Repository interface for managing Student entities. */
+/** Repository interface for managing {@link Student} entities. */
 public interface StudentRepository {
 
   /**

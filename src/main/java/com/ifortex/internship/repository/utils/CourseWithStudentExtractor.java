@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import org.springframework.dao.DataAccessException;
@@ -35,7 +34,7 @@ public class CourseWithStudentExtractor implements ResultSetExtractor<List<Cours
                 .startDate(rs.getObject("course_start_date", LocalDateTime.class))
                 .lastUpdateDate(rs.getObject("course_last_update_date", LocalDateTime.class))
                 .isOpen(rs.getBoolean("course_is_open"))
-                .students(new HashSet<>())
+                .students(new ArrayList<>())
                 .build();
         courseMap.put(course.getId(), course);
       }
