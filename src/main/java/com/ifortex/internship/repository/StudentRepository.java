@@ -1,10 +1,8 @@
 package com.ifortex.internship.repository;
 
 import com.ifortex.internship.model.Student;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /** Repository interface for managing {@link Student} entities. */
 public interface StudentRepository {
@@ -31,7 +29,7 @@ public interface StudentRepository {
    * @param courseId the unique identifier of the course
    * @return a set of students enrolled in the specified course
    */
-  Set<Student> findByCourseId(int courseId);
+  List<Student> findByCourseId(int courseId);
 
   /**
    * Creates a new student in the repository.
