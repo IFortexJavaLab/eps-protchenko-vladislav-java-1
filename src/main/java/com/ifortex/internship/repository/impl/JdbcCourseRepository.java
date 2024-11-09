@@ -48,7 +48,7 @@ public class JdbcCourseRepository implements CourseRepository {
   }
 
   @Override
-  public int create(Course course) {
+  public Course create(Course course) {
     KeyHolder keyHolder = new GeneratedKeyHolder();
     String sql =
         "INSERT INTO courses (name, description, price, duration, start_date, last_update_date, is_open) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -65,9 +65,9 @@ public class JdbcCourseRepository implements CourseRepository {
           return ps;
         },
         keyHolder);
-    int courseId = keyHolder.getKey().intValue();
-    saveCourseStudents(courseId, course.getStudents().stream().map(Student::getId).toList());
-    return courseId;
+    course.setId(keyHolder.getKey().intValue());
+    saveCourseStudents(course.getId(), course.getStudents().stream().map(Student::getId).toList());
+    return course;
   }
 
   private void saveCourseStudents(int courseId, List<Integer> studentIds) {

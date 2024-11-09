@@ -2,12 +2,15 @@ package com.ifortex.internship.repository.impl;
 
 import com.ifortex.internship.model.Student;
 import com.ifortex.internship.repository.StudentRepository;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,9 +42,18 @@ public class JdbcStudentRepository implements StudentRepository {
   }
 
   @Override
-  public void create(Student student) {
+  public Student create(Student student) {
+    KeyHolder keyHolder = new GeneratedKeyHolder();
     String sql = "INSERT INTO students (name) VALUES (?)";
-    jdbcTemplate.update(sql, student.getName());
+    jdbcTemplate.update(
+        connection -> {
+          PreparedStatement ps = connection.prepareStatement(sql, new String[] {"id"});
+          ps.setString(1, student.getName());
+          return ps;
+        },
+        keyHolder);
+    student.setId(keyHolder.getKey().intValue());
+    return student;
   }
 
   @Override

@@ -29,7 +29,7 @@ public interface CourseRepository {
    *
    * @param course the course to be saved
    */
-  int create(Course course);
+  Course create(Course course);
 
   /**
    * Deletes a course by its unique identifier.

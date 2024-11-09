@@ -27,7 +27,7 @@ public interface StudentRepository {
    * Retrieves all students associated with a specific course.
    *
    * @param courseId the unique identifier of the course
-   * @return a set of students enrolled in the specified course
+   * @return a list of students enrolled in the specified course
    */
   List<Student> findByCourseId(int courseId);
 
@@ -36,7 +36,7 @@ public interface StudentRepository {
    *
    * @param student the student to be saved
    */
-  void create(Student student);
+  Student create(Student student);
 
   /**
    * Updates an existing student's information in the repository.
