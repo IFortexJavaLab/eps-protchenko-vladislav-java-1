@@ -31,7 +31,6 @@ dependencies {
     implementation "org.postgresql:postgresql:$postgresqlDriverVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
     implementation "ch.qos.logback:logback-classic:$loggerVersion"
-    implementation "jakarta.validation:jakarta.validation-api:$jakartaValidationVersion"
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:$jakartaServletApiVersion"
     compileOnly "org.projectlombok:lombok:$lombokVersion"
