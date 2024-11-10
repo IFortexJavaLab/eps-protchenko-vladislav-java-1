@@ -64,13 +64,8 @@ public class StudentService {
 
   @Transactional
   public StudentDto deleteStudent(int id) {
-    Student student =
-        studentRepository
-            .findById(id)
-            .orElseThrow(
-                () ->
-                    new EntityNotFoundException(String.format("Student with id=%d not found", id)));
-    studentRepository.delete(student.getId());
-    return studentMapper.toDto(student);
+    StudentDto studentDto = getStudent(id);
+    studentRepository.delete(id);
+    return studentDto;
   }
 }
