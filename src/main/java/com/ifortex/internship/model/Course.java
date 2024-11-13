@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 public class Course {
 
   @EqualsAndHashCode.Exclude
-  private int id;
+  private long id;
   private String name;
   private String description;
   private BigDecimal price;
@@ -21,4 +21,5 @@ public class Course {
   private LocalDateTime lastUpdateDate;
   private boolean isOpen;
   private List<Student> students;
+
 }

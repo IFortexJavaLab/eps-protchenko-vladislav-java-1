@@ -3,69 +3,58 @@ package com.ifortex.internship.service;
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.EntityNotFoundException;
 import com.ifortex.internship.exception.InvalidRequestDataException;
-import com.ifortex.internship.mapper.StudentMapper;
 import com.ifortex.internship.model.Student;
-import com.ifortex.internship.repository.StudentRepository;
-import com.ifortex.internship.service.validator.StudentDtoValidator;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class StudentService {
+/**
+ * Service interface for managing {@link Student} entities in the application.
+ * Provides methods for retrieving, creating, updating, and deleting student records.
+ */
+public interface StudentService {
 
-  private final StudentRepository studentRepository;
+  /**
+   * Retrieves a student by their unique identifier.
+   *
+   * @param id the unique identifier of the student
+   * @return a {@link StudentDto} representing the student details
+   * @throws EntityNotFoundException if the student with the specified ID is not found
+   */
+  StudentDto getStudent(long id);
 
-  private final StudentMapper studentMapper;
+  /**
+   * Retrieves a list of all students.
+   *
+   * @return a list of {@link StudentDto} objects representing all students
+   */
+  List<StudentDto> getAllStudents();
 
-  private final StudentDtoValidator studentDtoValidator;
+  /**
+   * Creates a new student.
+   *
+   * @param studentDto the {@link StudentDto} object containing student details to create
+   * @return the created {@link StudentDto} object with its generated unique identifier
+   * @throws InvalidRequestDataException if the student data is invalid
+   */
+  StudentDto createStudent(StudentDto studentDto);
 
-  public StudentDto getStudent(int id) {
-    return studentMapper.toDto(
-        studentRepository
-            .findById(id)
-            .orElseThrow(
-                () ->
-                    new EntityNotFoundException(
-                        String.format("Student with id=%d not found", id))));
-  }
+  /**
+   * Updates an existing student.
+   *
+   * @param studentDto the {@link StudentDto} object containing updated student details
+   * @return the updated {@link StudentDto} object
+   * @throws EntityNotFoundException if the student with the specified ID does not exist
+   * @throws InvalidRequestDataException if the student data is invalid
+   */
+  StudentDto updateStudent(StudentDto studentDto);
 
-  public List<StudentDto> getAllStudents() {
-    return studentMapper.toDto(studentRepository.findAll());
-  }
-
-  @Transactional
-  public StudentDto createStudent(StudentDto studentDto) {
-    if (!studentDtoValidator.isValid(studentDto)) {
-      throw new InvalidRequestDataException("Invalid request data");
-    }
-    Student student = studentRepository.create(studentMapper.toEntity(studentDto));
-    return studentMapper.toDto(student);
-  }
-
-  @Transactional
-  public StudentDto updateStudent(StudentDto studentDto) {
-    if (!studentDtoValidator.isValid(studentDto)) {
-      throw new InvalidRequestDataException("Invalid request data");
-    }
-    Student student =
-        studentRepository
-            .findById(studentDto.id())
-            .orElseThrow(
-                () ->
-                    new EntityNotFoundException(
-                        String.format("Student with id=%d not found", studentDto.id())));
-    studentRepository.update(studentMapper.toEntity(studentDto));
-    return studentDto;
-  }
-
-  @Transactional
-  public StudentDto deleteStudent(int id) {
-    StudentDto studentDto = getStudent(id);
-    studentRepository.delete(id);
-    return studentDto;
-  }
+  /**
+   * Deletes a student by their unique identifier.
+   *
+   * @param id the unique identifier of the student to delete
+   * @return the deleted {@link StudentDto} object representing the student details
+   * @throws EntityNotFoundException if the student with the specified ID does not exist
+   */
+  StudentDto deleteStudent(long id);
 }
+

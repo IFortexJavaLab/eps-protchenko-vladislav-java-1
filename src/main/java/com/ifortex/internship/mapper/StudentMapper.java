@@ -10,7 +10,7 @@ import java.util.List;
 public class StudentMapper {
 
   public Student toEntity(StudentDto dto) {
-    return Student.builder().id(dto.id()).name(dto.name()).build();
+    return Student.builder().id(dto.getId()).name(dto.getName()).build();
   }
 
   public StudentDto toDto(Student entity) {

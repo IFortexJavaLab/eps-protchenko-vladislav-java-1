@@ -1,6 +1,14 @@
 package com.ifortex.internship.dto;
 
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 @Builder
-public record StudentDto(int id, String name) {}
+@Getter
+@Setter
+public class StudentDto {
+
+  private Long id;
+  private String name;
+}

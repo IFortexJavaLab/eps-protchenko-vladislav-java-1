@@ -14,7 +14,7 @@ public interface StudentRepository {
    * @return an {@link Optional} containing the found student, or an empty Optional if no student is
    *     found
    */
-  Optional<Student> findById(int id);
+  Optional<Student> findById(long id);
 
   /**
    * Retrieves all students.
@@ -29,7 +29,7 @@ public interface StudentRepository {
    * @param courseId the unique identifier of the course
    * @return a list of students enrolled in the specified course
    */
-  List<Student> findByCourseId(int courseId);
+  List<Student> findByCourseId(long courseId);
 
   /**
    * Creates a new student in the repository.
@@ -50,5 +50,5 @@ public interface StudentRepository {
    *
    * @param id the unique identifier of the student to be deleted
    */
-  void delete(int id);
+  void delete(long id);
 }

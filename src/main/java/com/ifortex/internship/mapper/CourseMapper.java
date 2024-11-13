@@ -14,13 +14,14 @@ public class CourseMapper {
 
   public Course toEntity(CourseDto dto) {
     return Course.builder()
-        .id(dto.id())
-        .name(dto.name())
-        .description(dto.description())
-        .price(dto.price())
-        .duration(dto.duration())
-        .startDate(dto.startDate())
-        .students(studentMapper.toEntity(dto.students()))
+        .id(dto.getId())
+        .name(dto.getName())
+        .description(dto.getDescription())
+        .price(dto.getPrice())
+        .duration(dto.getDuration())
+        .startDate(dto.getStartDate())
+        .isOpen(dto.getIsOpen())
+        .students(studentMapper.toEntity(dto.getStudents()))
         .build();
   }
 
@@ -32,6 +33,7 @@ public class CourseMapper {
         .price(entity.getPrice())
         .duration(entity.getDuration())
         .startDate(entity.getStartDate())
+        .isOpen(entity.isOpen())
         .students(studentMapper.toDto(entity.getStudents()))
         .build();
   }

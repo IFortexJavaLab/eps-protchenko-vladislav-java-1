@@ -1,107 +1,65 @@
 package com.ifortex.internship.service;
 
 import com.ifortex.internship.dto.CourseDto;
-import com.ifortex.internship.dto.StudentDto;
+import com.ifortex.internship.exception.CourseHasAlreadyStartedException;
 import com.ifortex.internship.exception.CourseIsFullException;
 import com.ifortex.internship.exception.EntityNotFoundException;
 import com.ifortex.internship.exception.InvalidRequestDataException;
-import com.ifortex.internship.mapper.CourseMapper;
 import com.ifortex.internship.model.Course;
-import com.ifortex.internship.repository.CourseRepository;
-import com.ifortex.internship.service.validator.CourseDtoValidator;
-import java.time.LocalDateTime;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-@Service
-@RequiredArgsConstructor
-public class CourseService {
+/**
+ * Service interface for managing {@link Course} entities in the application. Provides methods for
+ * retrieving, creating, updating, and deleting course records.
+ */
+public interface CourseService {
 
-  private final int MIN_STUDENTS = 30;
-  private final int MAX_STUDENTS = 150;
+  /**
+   * Retrieves a course by its unique identifier.
+   *
+   * @param id the unique identifier of the course
+   * @return a {@link CourseDto} representing the course details
+   * @throws EntityNotFoundException if the course with the specified ID is not found
+   */
+  CourseDto getCourse(long id);
 
-  private final CourseRepository courseRepository;
+  /**
+   * Retrieves a list of all courses.
+   *
+   * @return a list of {@link CourseDto} objects representing all courses
+   */
+  List<CourseDto> getAllCourses();
 
-  private final CourseMapper courseMapper;
+  /**
+   * Creates a new course.
+   *
+   * @param courseDto the {@link CourseDto} object containing course details to create
+   * @return the created {@link CourseDto} object with its generated unique identifier
+   * @throws InvalidRequestDataException if the course data is invalid
+   * @throws CourseIsFullException if the student list consists of more than 150 students
+   */
+  CourseDto createCourse(CourseDto courseDto);
 
-  private final CourseDtoValidator courseDtoValidator;
+  /**
+   * Updates an existing course.
+   *
+   * @param courseDto the {@link CourseDto} object containing updated course details
+   * @return the updated {@link CourseDto} object
+   * @throws EntityNotFoundException if the course with the specified ID does not exist
+   * @throws InvalidRequestDataException if the course data is invalid
+   * @throws CourseIsFullException if the student list consists of more than 150 students
+   * @throws CourseHasAlreadyStartedException when trying to open closed course or update course
+   *     students after start date
+   */
+  CourseDto updateCourse(CourseDto courseDto);
 
-  private Map<String, Object> getFieldsForUpdate(CourseDto courseDto) {
-    Map<String, Object> fields = new HashMap<>();
-    if (courseDto.name() != null) fields.put("name", courseDto.name());
-    if (courseDto.description() != null) fields.put("description", courseDto.description());
-    if (courseDto.price() != null) fields.put("price", courseDto.price());
-    if (courseDto.duration() != null) fields.put("duration", courseDto.duration());
-    if (courseDto.startDate() != null) fields.put("start_date", courseDto.startDate());
-
-    fields.put("last_update_date", LocalDateTime.now());
-
-    if (courseDto.students().size() < MIN_STUDENTS) fields.put("is_open", false);
-    else fields.put("is_open", true);
-
-    return fields;
-  }
-
-  public CourseDto getCourse(int id) {
-    return courseMapper.toDto(
-        courseRepository
-            .findById(id)
-            .orElseThrow(
-                () ->
-                    new EntityNotFoundException(String.format("Course with id %s not found", id))));
-  }
-
-  public List<CourseDto> getAllCourses() {
-    return courseMapper.toDto(courseRepository.findAll());
-  }
-
-  @Transactional
-  public CourseDto createCourse(CourseDto courseDto) {
-    if (!courseDtoValidator.isValidForCreate(courseDto)) {
-      throw new InvalidRequestDataException("Invalid request data");
-    }
-    if (courseDto.students().size() > MAX_STUDENTS) {
-      throw new CourseIsFullException("Course can't have more than 150 students");
-    }
-    Course course = courseMapper.toEntity(courseDto);
-    course.setLastUpdateDate(LocalDateTime.now());
-    boolean isOpen = course.getStudents().size() < MIN_STUDENTS;
-    course.setOpen(isOpen);
-    return courseMapper.toDto(courseRepository.create(course));
-  }
-
-  @Transactional
-  public CourseDto updateCourse(CourseDto courseDto) {
-    if (!courseDtoValidator.isValidForUpdate(courseDto)) {
-      throw new InvalidRequestDataException("Invalid request data");
-    }
-    Course course =
-        courseRepository
-            .findById(courseDto.id())
-            .orElseThrow(
-                () ->
-                    new EntityNotFoundException(
-                        String.format("Course with id %s not found", courseDto.id())));
-    courseRepository.update(course.getId(), getFieldsForUpdate(courseDto));
-
-    if (courseDto.students() != null) {
-      if (courseDto.students().size() > MAX_STUDENTS) {
-        throw new CourseIsFullException("Course can't have more than 150 students");
-      }
-      courseRepository.updateCourseStudents(
-          course, courseDto.students().stream().map(StudentDto::id).toList());
-    }
-    return courseMapper.toDto(courseRepository.findById(courseDto.id()).get());
-  }
-
-  @Transactional
-  public CourseDto deleteCourse(int id) {
-    CourseDto courseDto = getCourse(id);
-    courseRepository.delete(id);
-    return courseDto;
-  }
+  /**
+   * Deletes a course by its unique identifier.
+   *
+   * @param id the unique identifier of the course to delete
+   * @return the deleted {@link CourseDto} object representing the course details
+   * @throws EntityNotFoundException if the course with the specified ID does not exist
+   */
+  CourseDto deleteCourse(long id);
 }

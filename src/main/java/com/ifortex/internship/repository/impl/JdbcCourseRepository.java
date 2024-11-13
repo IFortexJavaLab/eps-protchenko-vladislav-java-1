@@ -4,6 +4,7 @@ import com.ifortex.internship.model.Course;
 import com.ifortex.internship.model.Student;
 import com.ifortex.internship.repository.CourseRepository;
 import com.ifortex.internship.repository.utils.CourseWithStudentExtractor;
+import com.ifortex.internship.service.enums.CourseField;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class JdbcCourseRepository implements CourseRepository {
           """;
 
   @Override
-  public Optional<Course> findById(int id) {
+  public Optional<Course> findById(long id) {
     String sql = findAllCoursesSql.concat("\nWHERE c.id = ?");
     List<Course> courses = jdbcTemplate.query(sql, courseWithStudentExtractor, id);
     return courses.stream().findFirst();
@@ -65,31 +66,31 @@ public class JdbcCourseRepository implements CourseRepository {
           return ps;
         },
         keyHolder);
-    course.setId(keyHolder.getKey().intValue());
+    course.setId(keyHolder.getKey().longValue());
     saveCourseStudents(course.getId(), course.getStudents().stream().map(Student::getId).toList());
     return course;
   }
 
-  private void saveCourseStudents(int courseId, List<Integer> studentIds) {
+  private void saveCourseStudents(long courseId, List<Long> studentIds) {
     String sql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
     jdbcTemplate.batchUpdate(
         sql,
         studentIds,
         studentIds.size(),
         (ps, studentId) -> {
-          ps.setInt(1, courseId);
-          ps.setInt(2, studentId);
+          ps.setLong(1, courseId);
+          ps.setLong(2, studentId);
         });
   }
 
   @Override
-  public void update(int courseId, Map<String, Object> fields) {
+  public void update(long courseId, Map<CourseField, Object> fields) {
     StringBuilder sqlBuilder = new StringBuilder("UPDATE courses SET ");
     List<Object> values = new ArrayList<>();
 
     fields.forEach(
         (key, value) -> {
-          sqlBuilder.append(key).append(" = ?, ");
+          sqlBuilder.append(key.toString()).append(" = ?, ");
           values.add(value);
         });
 
@@ -101,15 +102,15 @@ public class JdbcCourseRepository implements CourseRepository {
   }
 
   @Override
-  public void updateCourseStudents(Course course, List<Integer> newStudentIds) {
+  public void updateCourseStudents(Course course, List<Long> newStudentIds) {
     String deleteSql = "DELETE FROM m2m_student_course WHERE course_id = ? AND student_id = ?";
     jdbcTemplate.batchUpdate(
         deleteSql,
         course.getStudents(),
         course.getStudents().size(),
         (ps, student) -> {
-          ps.setInt(1, course.getId());
-          ps.setInt(2, student.getId());
+          ps.setLong(1, course.getId());
+          ps.setLong(2, student.getId());
         });
 
     String insertSql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
@@ -118,13 +119,13 @@ public class JdbcCourseRepository implements CourseRepository {
         newStudentIds,
         newStudentIds.size(),
         (ps, studentId) -> {
-          ps.setInt(1, course.getId());
-          ps.setInt(2, studentId);
+          ps.setLong(1, course.getId());
+          ps.setLong(2, studentId);
         });
   }
 
   @Override
-  public void delete(int courseId) {
+  public void delete(long courseId) {
     String deleteAssociationsSql = "DELETE FROM m2m_student_course WHERE course_id = ?";
     jdbcTemplate.update(deleteAssociationsSql, courseId);
 

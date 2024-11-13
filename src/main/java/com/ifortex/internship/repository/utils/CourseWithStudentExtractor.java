@@ -18,10 +18,10 @@ public class CourseWithStudentExtractor implements ResultSetExtractor<List<Cours
 
   @Override
   public List<Course> extractData(ResultSet rs) throws SQLException, DataAccessException {
-    Map<Integer, Course> courseMap = new HashMap<>();
+    Map<Long, Course> courseMap = new HashMap<>();
 
     while (rs.next()) {
-      int courseId = rs.getInt("course_id");
+      long courseId = rs.getInt("course_id");
       Course course = courseMap.get(courseId);
       if (course == null) {
         course =

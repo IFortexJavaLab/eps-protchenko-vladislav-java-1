@@ -9,6 +9,6 @@ import lombok.EqualsAndHashCode;
 public class Student {
 
   @EqualsAndHashCode.Exclude
-  private int id;
+  private long id;
   private String name;
 }
