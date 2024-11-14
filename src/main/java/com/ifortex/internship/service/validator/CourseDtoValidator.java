@@ -8,7 +8,6 @@ import com.ifortex.internship.exception.InvalidRequestDataException;
 import com.ifortex.internship.model.Course;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -26,17 +25,13 @@ public class CourseDtoValidator {
   private final StudentDtoValidator studentDtoValidator;
 
   public void validateForCreate(CourseDto courseDto) {
-    if (courseDto.getStudents() == null) {
-      courseDto.setStudents(new ArrayList<>());
-    }
-    if (courseDto.getStudents().size() > MAX_STUDENTS_COUNT) {
-      throw new CourseIsFullException("Course can not have more than 150 students");
-    }
     validateName(courseDto.getName());
     validatePrice(courseDto.getPrice());
     validateDuration(courseDto.getDuration());
     validateStartDateForCreate(courseDto.getStartDate().toLocalDate());
-    validateStudents(courseDto.getStudents());
+    if (courseDto.getStudents() != null) {
+      validateStudents(courseDto.getStudents());
+    }
   }
 
   public void validateForUpdate(CourseDto courseDto, Course course) {
@@ -51,13 +46,13 @@ public class CourseDtoValidator {
     }
     if (courseDto.getStartDate() != null) {
       validateStartDateForUpdate(
-              courseDto.getStartDate().toLocalDate(), course.getStartDate().toLocalDate());
+          courseDto.getStartDate().toLocalDate(), course.getStartDate().toLocalDate());
     }
     if (courseDto.getIsOpen() != null) {
       LocalDate startDate =
-              courseDto.getStartDate() != null
-                      ? courseDto.getStartDate().toLocalDate()
-                      : course.getStartDate().toLocalDate();
+          courseDto.getStartDate() != null
+              ? courseDto.getStartDate().toLocalDate()
+              : course.getStartDate().toLocalDate();
       validateIsOpen(courseDto.getIsOpen(), course.isOpen(), startDate);
     }
     if (courseDto.getStudents() != null) {
@@ -85,7 +80,8 @@ public class CourseDtoValidator {
 
   private void validateStartDateForUpdate(LocalDate newStartDate, LocalDate oldStartDate) {
     if (!oldStartDate.isAfter(LocalDate.now())) {
-      throw new CourseHasAlreadyStartedException("Course has already started. Can not change start date");
+      throw new CourseHasAlreadyStartedException(
+          "Course has already started. Can not change start date");
     }
     if (newStartDate.isBefore(LocalDate.now())) {
       throw new InvalidRequestDataException("Invalid course start date");
@@ -103,7 +99,8 @@ public class CourseDtoValidator {
     boolean isOpeningClosedCourse = !oldIsOpen && newIsOpen;
     boolean invalidStatusChange = courseAlreadyStarted && isOpeningClosedCourse;
     if (invalidStatusChange) {
-      throw new CourseHasAlreadyStartedException("Course has already started. Can not change status");
+      throw new CourseHasAlreadyStartedException(
+          "Course has already started. Can not change status");
     }
   }
 

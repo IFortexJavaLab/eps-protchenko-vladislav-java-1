@@ -2,17 +2,18 @@ package com.ifortex.internship.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-@Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@Accessors(chain = true)
 public class CourseDto {
 
   private Long id;
@@ -21,7 +22,6 @@ public class CourseDto {
 
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private BigDecimal price;
-
   private Integer duration;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING)

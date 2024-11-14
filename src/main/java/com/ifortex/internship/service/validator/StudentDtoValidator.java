@@ -17,9 +17,11 @@ public class StudentDtoValidator {
   private void validateName(String name) {
     boolean isNameProvided = name != null && !name.isBlank();
     boolean isNameLengthValid =
-            name != null && name.length() >= MIN_NAME_LENGTH && name.length() <= MAX_NAME_LENGTH;
-    boolean isNameValid = isNameProvided && isNameLengthValid;
-    if (isNameValid) {
+        name != null
+            && name.trim().length() >= MIN_NAME_LENGTH
+            && name.trim().length() <= MAX_NAME_LENGTH;
+    boolean isNameInvalid = !isNameProvided || !isNameLengthValid;
+    if (isNameInvalid) {
       throw new InvalidRequestDataException("Invalid student name");
     }
   }

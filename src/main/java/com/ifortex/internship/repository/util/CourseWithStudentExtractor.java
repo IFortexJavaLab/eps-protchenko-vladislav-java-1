@@ -39,9 +39,12 @@ public class CourseWithStudentExtractor implements ResultSetExtractor<List<Cours
         courseMap.put(course.getId(), course);
       }
 
-      Student student =
-          Student.builder().id(rs.getInt("student_id")).name(rs.getString("student_name")).build();
-      course.getStudents().add(student);
+      long studentId = rs.getInt("student_id");
+      if (studentId != 0) {
+        Student student =
+            Student.builder().id(studentId).name(rs.getString("student_name")).build();
+        course.getStudents().add(student);
+      }
     }
 
     return new ArrayList<>(courseMap.values());

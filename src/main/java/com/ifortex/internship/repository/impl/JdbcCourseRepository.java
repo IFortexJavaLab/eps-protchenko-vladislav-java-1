@@ -67,7 +67,10 @@ public class JdbcCourseRepository implements CourseRepository {
         },
         keyHolder);
     course.setId(keyHolder.getKey().longValue());
-    saveCourseStudents(course.getId(), course.getStudents().stream().map(Student::getId).toList());
+    Optional.ofNullable(course.getStudents())
+        .ifPresent(
+            (list) ->
+                saveCourseStudents(course.getId(), list.stream().map(Student::getId).toList()));
     return course;
   }
 
@@ -84,18 +87,18 @@ public class JdbcCourseRepository implements CourseRepository {
   }
 
   @Override
-  public void update(long courseId, Map<CourseField, Object> fields) {
+  public void update(long courseId, Map<CourseField, Object> fieldMap) {
     StringBuilder sqlBuilder = new StringBuilder("UPDATE courses SET ");
+    List<String> fields = new ArrayList<>();
     List<Object> values = new ArrayList<>();
 
-    fields.forEach(
+    fieldMap.forEach(
         (key, value) -> {
-          sqlBuilder.append(key.toString()).append(" = ?, ");
+          fields.add(key.toString());
           values.add(value);
         });
 
-    sqlBuilder.setLength(sqlBuilder.length() - 2);
-    sqlBuilder.append(" WHERE id = ?");
+    sqlBuilder.append(String.join(" = ?, ", fields)).append(" = ? WHERE id = ?");
     values.add(courseId);
 
     jdbcTemplate.update(sqlBuilder.toString(), values.toArray());
