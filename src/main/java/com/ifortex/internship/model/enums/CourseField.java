@@ -1,4 +1,4 @@
-package com.ifortex.internship.service.enums;
+package com.ifortex.internship.model.enums;
 
 public enum CourseField {
     NAME("name"),

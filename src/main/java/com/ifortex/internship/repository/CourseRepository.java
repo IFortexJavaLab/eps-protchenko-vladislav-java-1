@@ -1,7 +1,7 @@
 package com.ifortex.internship.repository;
 
 import com.ifortex.internship.model.Course;
-import com.ifortex.internship.service.enums.CourseField;
+import com.ifortex.internship.model.enums.CourseField;
 
 import java.util.List;
 import java.util.Map;

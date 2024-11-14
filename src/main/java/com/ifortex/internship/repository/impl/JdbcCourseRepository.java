@@ -2,9 +2,9 @@ package com.ifortex.internship.repository.impl;
 
 import com.ifortex.internship.model.Course;
 import com.ifortex.internship.model.Student;
+import com.ifortex.internship.model.enums.CourseField;
 import com.ifortex.internship.repository.CourseRepository;
-import com.ifortex.internship.repository.utils.CourseWithStudentExtractor;
-import com.ifortex.internship.service.enums.CourseField;
+import com.ifortex.internship.repository.util.CourseWithStudentExtractor;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class JdbcCourseRepository implements CourseRepository {
 

@@ -1,4 +1,4 @@
-package com.ifortex.internship.repository.utils;
+package com.ifortex.internship.repository.util;
 
 import com.ifortex.internship.model.Course;
 import com.ifortex.internship.model.Student;

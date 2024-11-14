@@ -6,9 +6,9 @@ import com.ifortex.internship.exception.EntityNotFoundException;
 import com.ifortex.internship.mapper.CourseMapper;
 import com.ifortex.internship.mapper.StudentMapper;
 import com.ifortex.internship.model.Course;
+import com.ifortex.internship.model.enums.CourseField;
 import com.ifortex.internship.repository.CourseRepository;
 import com.ifortex.internship.service.CourseService;
-import com.ifortex.internship.service.enums.CourseField;
 import com.ifortex.internship.service.validator.CourseDtoValidator;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -47,7 +47,7 @@ public class CourseServiceImpl implements CourseService {
     course.setLastUpdateDate(LocalDateTime.now());
     return courseMapper.toDto(courseRepository.create(course));
   }
-  
+
   @Transactional
   public CourseDto updateCourse(CourseDto courseDto) {
     Course oldCourseEntity =
@@ -70,10 +70,11 @@ public class CourseServiceImpl implements CourseService {
   }
 
   @Transactional
-  public CourseDto deleteCourse(long id) {
-    CourseDto courseDto = getCourse(id);
+  public void deleteCourse(long id) {
+    if (courseRepository.findById(id).isEmpty()) {
+      throw new EntityNotFoundException(String.format("Course with id %s not found", id));
+    }
     courseRepository.delete(id);
-    return courseDto;
   }
 
   private void mapNewDtoFields(Course oldCourseEntity, CourseDto courseDto) {
@@ -99,7 +100,7 @@ public class CourseServiceImpl implements CourseService {
       courseDto.setStudents(studentMapper.toDto(oldCourseEntity.getStudents()));
     }
   }
-  
+
   private Map<CourseField, Object> getFieldsForUpdate(CourseDto courseDto) {
     Map<CourseField, Object> fields = new HashMap<>();
     if (courseDto.getName() != null) {

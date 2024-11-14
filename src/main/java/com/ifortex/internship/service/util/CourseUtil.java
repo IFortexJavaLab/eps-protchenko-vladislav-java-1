@@ -9,11 +9,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CourseUtil {
 
-    private final TechnicalRepository repository;
+  private final TechnicalRepository repository;
 
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void scheduled() {
-        repository.updateCourseState();
-    }
-
+  @Scheduled(cron = "0 0 0 * * ?")
+  public void scheduled() {
+    repository.updateCourseState();
+  }
 }

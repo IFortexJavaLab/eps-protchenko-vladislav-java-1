@@ -59,9 +59,10 @@ public class StudentServiceImpl implements StudentService {
 
   @Transactional
   @Override
-  public StudentDto deleteStudent(long id) {
-    StudentDto studentDto = getStudent(id);
+  public void deleteStudent(long id) {
+    if (studentRepository.findById(id).isEmpty()) {
+      throw new EntityNotFoundException(String.format("Student with id=%d not found", id));
+    }
     studentRepository.delete(id);
-    return studentDto;
   }
 }

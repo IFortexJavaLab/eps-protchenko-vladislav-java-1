@@ -58,8 +58,7 @@ public interface CourseService {
    * Deletes a course by its unique identifier.
    *
    * @param id the unique identifier of the course to delete
-   * @return the deleted {@link CourseDto} object representing the course details
    * @throws EntityNotFoundException if the course with the specified ID does not exist
    */
-  CourseDto deleteCourse(long id);
+  void deleteCourse(long id);
 }

@@ -52,9 +52,8 @@ public interface StudentService {
    * Deletes a student by their unique identifier.
    *
    * @param id the unique identifier of the student to delete
-   * @return the deleted {@link StudentDto} object representing the student details
    * @throws EntityNotFoundException if the student with the specified ID does not exist
    */
-  StudentDto deleteStudent(long id);
+  void deleteStudent(long id);
 }
 
