@@ -2,17 +2,15 @@ package com.ifortex.internship.mapper;
 
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.model.Student;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
-import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 @Component
 public class StudentMapper {
 
   public Student toEntity(StudentDto dto) {
     return Student.builder()
-        .id(Optional.ofNullable(dto.getId()).orElse(0L))
+        .id(dto.getId())
         .name(dto.getName())
         .build();
   }

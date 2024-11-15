@@ -16,7 +16,7 @@ public class CourseMapper {
   public Course toEntity(CourseDto dto) {
     Course course =
         Course.builder()
-            .id(Optional.ofNullable(dto.getId()).orElse(0L))
+            .id(dto.getId())
             .name(dto.getName())
             .description(dto.getDescription())
             .price(dto.getPrice())

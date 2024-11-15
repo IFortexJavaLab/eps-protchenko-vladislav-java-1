@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 public class Course {
 
   @EqualsAndHashCode.Exclude
-  private long id;
+  private Long id;
   private String name;
   private String description;
   private BigDecimal price;

@@ -20,7 +20,7 @@ public class JdbcStudentRepository implements StudentRepository {
   private final JdbcTemplate jdbcTemplate;
 
   private final RowMapper<Student> studentRowMapper =
-      (rs, rowNum) -> Student.builder().id(rs.getInt("id")).name(rs.getString("name")).build();
+      (rs, rowNum) -> Student.builder().id(rs.getLong("id")).name(rs.getString("name")).build();
 
   @Override
   public Optional<Student> findById(long id) {
