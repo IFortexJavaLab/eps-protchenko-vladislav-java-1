@@ -38,6 +38,7 @@ public class CourseMapper {
             .setPrice(entity.getPrice())
             .setDuration(entity.getDuration())
             .setStartDate(entity.getStartDate())
+            .setLastUpdateDate(entity.getLastUpdateDate())
             .setIsOpen(entity.isOpen());
     dto.setStudents(
         studentMapper.toDto(Optional.ofNullable(entity.getStudents()).orElse(List.of())));

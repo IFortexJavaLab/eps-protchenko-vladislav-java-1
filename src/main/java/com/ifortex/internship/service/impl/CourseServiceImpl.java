@@ -57,6 +57,7 @@ public class CourseServiceImpl implements CourseService {
                 () ->
                     new EntityNotFoundException(
                         String.format("Course with id %s not found", courseDto.getId())));
+    courseDto.setLastUpdateDate(LocalDateTime.now());
     courseDtoValidator.validateForUpdate(courseDto, oldCourseEntity);
     courseRepository.update(courseDto.getId(), getFieldsForUpdate(courseDto));
 
@@ -121,7 +122,7 @@ public class CourseServiceImpl implements CourseService {
     if (courseDto.getIsOpen() != null) {
       fields.put(CourseField.IS_OPEN, courseDto.getIsOpen());
     }
-    fields.put(CourseField.LAST_UPDATE_DATE, LocalDateTime.now());
+    fields.put(CourseField.LAST_UPDATE_DATE, courseDto.getLastUpdateDate());
 
     return fields;
   }

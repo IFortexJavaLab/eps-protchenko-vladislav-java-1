@@ -1,7 +1,7 @@
 package com.ifortex.internship.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +27,8 @@ public class CourseDto {
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private LocalDateTime startDate;
 
-  @JsonIgnore
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime lastUpdateDate;
   private Boolean isOpen;
   private List<StudentDto> students;
