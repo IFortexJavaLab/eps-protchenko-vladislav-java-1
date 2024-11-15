@@ -1,6 +1,8 @@
 package com.ifortex.internship.repository;
 
 import com.ifortex.internship.model.Course;
+import com.ifortex.internship.model.enums.CourseField;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +17,7 @@ public interface CourseRepository {
    * @return an {@link Optional} containing the found course, or an empty Optional if no course is
    *     found
    */
-  Optional<Course> findById(int id);
+  Optional<Course> findById(long id);
 
   /**
    * Retrieves all courses.
@@ -36,7 +38,7 @@ public interface CourseRepository {
    *
    * @param courseId the unique identifier of the course to be deleted
    */
-  void delete(int courseId);
+  void delete(long courseId);
 
   /**
    * Updates an existing course's information in the repository.
@@ -44,7 +46,7 @@ public interface CourseRepository {
    * @param courseId the id of the course for which the student associations are updated.
    * @param fields a map of fields that should be updated.
    */
-  void update(int courseId, Map<String, Object> fields);
+  void update(long courseId, Map<CourseField, Object> fields);
 
   /**
    * Updates the students associated with a specific course based on new and existing student IDs.
@@ -53,5 +55,5 @@ public interface CourseRepository {
    * @param newStudentIds a set of student IDs that should be associated with the course after the
    *     update.
    */
-  void updateCourseStudents(Course course, List<Integer> newStudentIds);
+  void updateCourseStudents(Course course, List<Long> newStudentIds);
 }

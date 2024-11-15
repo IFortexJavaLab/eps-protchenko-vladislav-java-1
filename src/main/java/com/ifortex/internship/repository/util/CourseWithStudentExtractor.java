@@ -1,4 +1,4 @@
-package com.ifortex.internship.repository.utils;
+package com.ifortex.internship.repository.util;
 
 import com.ifortex.internship.model.Course;
 import com.ifortex.internship.model.Student;
@@ -18,10 +18,10 @@ public class CourseWithStudentExtractor implements ResultSetExtractor<List<Cours
 
   @Override
   public List<Course> extractData(ResultSet rs) throws SQLException, DataAccessException {
-    Map<Integer, Course> courseMap = new HashMap<>();
+    Map<Long, Course> courseMap = new HashMap<>();
 
     while (rs.next()) {
-      int courseId = rs.getInt("course_id");
+      long courseId = rs.getInt("course_id");
       Course course = courseMap.get(courseId);
       if (course == null) {
         course =
@@ -39,9 +39,12 @@ public class CourseWithStudentExtractor implements ResultSetExtractor<List<Cours
         courseMap.put(course.getId(), course);
       }
 
-      Student student =
-          Student.builder().id(rs.getInt("student_id")).name(rs.getString("student_name")).build();
-      course.getStudents().add(student);
+      long studentId = rs.getInt("student_id");
+      if (studentId != 0) {
+        Student student =
+            Student.builder().id(studentId).name(rs.getString("student_name")).build();
+        course.getStudents().add(student);
+      }
     }
 
     return new ArrayList<>(courseMap.values());

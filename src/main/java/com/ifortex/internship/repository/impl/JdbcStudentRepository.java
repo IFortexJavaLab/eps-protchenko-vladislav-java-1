@@ -11,19 +11,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class JdbcStudentRepository implements StudentRepository {
 
   private final JdbcTemplate jdbcTemplate;
 
   private final RowMapper<Student> studentRowMapper =
-      (rs, rowNum) -> Student.builder().id(rs.getInt("id")).name(rs.getString("name")).build();
+      (rs, rowNum) -> Student.builder().id(rs.getLong("id")).name(rs.getString("name")).build();
 
   @Override
-  public Optional<Student> findById(int id) {
+  public Optional<Student> findById(long id) {
     String sql = "SELECT * FROM students WHERE id = ?";
     return jdbcTemplate.query(sql, studentRowMapper, id).stream().findFirst();
   }
@@ -35,7 +35,7 @@ public class JdbcStudentRepository implements StudentRepository {
   }
 
   @Override
-  public List<Student> findByCourseId(int courseId) {
+  public List<Student> findByCourseId(long courseId) {
     String sql =
         "SELECT * FROM students s JOIN public.m2m_student_course m on s.id = m.student_id WHERE course_id = ?";
     return new ArrayList<>(jdbcTemplate.query(sql, studentRowMapper, courseId));
@@ -52,7 +52,7 @@ public class JdbcStudentRepository implements StudentRepository {
           return ps;
         },
         keyHolder);
-    student.setId(keyHolder.getKey().intValue());
+    student.setId(keyHolder.getKey().longValue());
     return student;
   }
 
@@ -63,7 +63,7 @@ public class JdbcStudentRepository implements StudentRepository {
   }
 
   @Override
-  public void delete(int id) {
+  public void delete(long id) {
     String sql = "DELETE FROM students WHERE id = ?";
     jdbcTemplate.update(sql, id);
   }

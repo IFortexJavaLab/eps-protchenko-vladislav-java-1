@@ -67,3 +67,18 @@ SELECT course_id,
        student_id
 FROM course_student_enrollments
 ORDER BY course_id, student_id;
+
+CREATE OR REPLACE PROCEDURE close_today_courses()
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    UPDATE courses c
+    SET is_open = false
+    WHERE c.start_date::DATE = current_date
+      AND (SELECT count(*)
+           FROM m2m_student_course m
+           WHERE m.course_id = c.id) < 30;
+END;
+$$;
+
