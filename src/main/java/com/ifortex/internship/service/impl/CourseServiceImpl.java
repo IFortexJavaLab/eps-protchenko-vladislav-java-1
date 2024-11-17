@@ -47,9 +47,6 @@ public class CourseServiceImpl implements CourseService {
   @Override
   public CourseDto createCourse(CourseDto courseDto) {
     courseDtoValidator.validateForCreate(courseDto);
-    //    if (courseRepository.getExistingStudentsCount(studentIds) != studentIds.size()) {
-    //      throw new InvalidRequestDataException("Student list is incorrect");
-    //    }
     Course course = courseMapper.toEntity(courseDto);
     List<Long> studentIds = courseDto.getStudents().stream().map(StudentDto::getId).toList();
     course.setStudents(courseRepository.getExistingStudents(studentIds));
