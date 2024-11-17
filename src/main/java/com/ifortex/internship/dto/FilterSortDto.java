@@ -1,6 +1,5 @@
 package com.ifortex.internship.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ifortex.internship.dto.enums.SortType;
 import lombok.Getter;
@@ -13,15 +12,13 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class FilterSortDto {
+  private String studentName;
+  private String courseName;
+  private String courseDescription;
 
-    private String studentName;
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private SortType sortByDate;
 
-    private String courseName;
-    private String courseDescription;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private SortType sortByDate;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private SortType sortByName;
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private SortType sortByName;
 }

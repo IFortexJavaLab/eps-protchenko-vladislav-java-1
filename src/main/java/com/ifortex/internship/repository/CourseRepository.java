@@ -58,7 +58,7 @@ public interface CourseRepository {
   void update(long courseId, Map<CourseField, Object> fields);
 
   /**
-   * Updates the students associated with a specific course based on new and existing student IDs.
+   * Retrieves a list of existing {@link Student}s whose IDs are passed in the List.
    *
    * @param studentsIds a list of student IDs that should be associated with the course after the
    *     update.
@@ -67,7 +67,7 @@ public interface CourseRepository {
   List<Student> getExistingStudents(List<Long> studentsIds);
 
   /**
-   * Updates the students associated with a specific course based on new and existing student IDs.
+   * Updates the {@link Student}s associated with a specific course based on new and existing student IDs.
    *
    * @param course the course for which the student associations are updated.
    * @param newStudentIds a set of student IDs that should be associated with the course after the

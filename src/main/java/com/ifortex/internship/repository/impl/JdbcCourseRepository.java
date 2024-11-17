@@ -30,8 +30,7 @@ public class JdbcCourseRepository implements CourseRepository {
   private final CourseWithStudentExtractor courseWithStudentExtractor;
 
   private final RowMapper<Student> studentRowMapper =
-          (rs, rowNum) -> Student.builder().id(rs.getLong("id")).name(rs.getString("name")).build();
-
+      (rs, rowNum) -> Student.builder().id(rs.getLong("id")).name(rs.getString("name")).build();
 
   private final String findAllCoursesSql =
       """
@@ -80,14 +79,11 @@ public class JdbcCourseRepository implements CourseRepository {
       sqlBuilder.append(" ORDER BY c.start_date ").append(dto.getSortByDate().name().toUpperCase());
       hasSort = true;
     }
-
     if (dto.getSortByName() != null) {
-      if (hasSort) {
-        sqlBuilder.append(", ");
-      } else {
-        sqlBuilder.append(" ORDER BY ");
-      }
-      sqlBuilder.append("c.name ").append(dto.getSortByName().name().toUpperCase());
+      sqlBuilder
+          .append(hasSort ? ", " : " ORDER BY ")
+          .append("c.name ")
+          .append(dto.getSortByName().name().toUpperCase());
     }
     return jdbcTemplate.query(sqlBuilder.toString(), courseWithStudentExtractor, values.toArray());
   }
@@ -143,6 +139,11 @@ public class JdbcCourseRepository implements CourseRepository {
     }
     String sql = "SELECT * FROM students WHERE id IN (:studentIds)";
     Map<String, Object> parameters = Map.of("studentIds", studentIds);
+
+    StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM students WHERE id IN (");
+    sqlBuilder.append(String.join(", ", studentIds.stream().map(Object::toString).toList()));
+    sqlBuilder.append(")");
+
     return new ArrayList<>(namedParameterJdbcTemplate.query(sql, parameters, studentRowMapper));
   }
 
