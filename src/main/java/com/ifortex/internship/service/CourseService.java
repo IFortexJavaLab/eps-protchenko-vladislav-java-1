@@ -17,7 +17,7 @@ import java.util.List;
 public interface CourseService {
 
   /**
-   * Retrieves a course by its unique identifier.
+   * Retrieves a {@link Course} by its unique identifier.
    *
    * @param id the unique identifier of the course
    * @return a {@link CourseDto} representing the course details
@@ -26,14 +26,14 @@ public interface CourseService {
   CourseDto getCourse(long id);
 
   /**
-   * Retrieves a list of all courses.
+   * Retrieves a list of all {@link Course}s.
    *
    * @return a list of {@link CourseDto} objects representing all courses
    */
   List<CourseDto> getAllCourses();
 
   /**
-   * Creates a new course.
+   * Creates a new {@link Course}.
    *
    * @param courseDto the {@link CourseDto} object containing course details to create
    * @return the created {@link CourseDto} object with its generated unique identifier
@@ -43,7 +43,7 @@ public interface CourseService {
   CourseDto createCourse(CourseDto courseDto);
 
   /**
-   * Updates an existing course.
+   * Updates an existing {@link Course}.
    *
    * @param courseDto the {@link CourseDto} object containing updated course details
    * @return the updated {@link CourseDto} object
@@ -56,12 +56,18 @@ public interface CourseService {
   CourseDto updateCourse(CourseDto courseDto);
 
   /**
-   * Deletes a course by its unique identifier.
+   * Deletes a {@link Course} by its unique identifier.
    *
    * @param id the unique identifier of the course to delete
    * @throws EntityNotFoundException if the course with the specified ID does not exist
    */
   void deleteCourse(long id);
 
+/**
+ * Retrieves a list of {@link Course}s based on the provided filter and sorting criteria.
+ *
+ * @param dto the filter and sort criteria encapsulated in a {@link FilterSortDto}
+ * @return a list of {@link CourseDto} objects that match the filter and sorting criteria.
+ */
   List<CourseDto> getCoursesWithFilterAndSort(FilterSortDto dto);
 }
