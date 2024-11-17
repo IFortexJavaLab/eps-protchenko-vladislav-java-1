@@ -2,8 +2,8 @@ package com.ifortex.internship.repository;
 
 import com.ifortex.internship.dto.FilterSortDto;
 import com.ifortex.internship.model.Course;
+import com.ifortex.internship.model.Student;
 import com.ifortex.internship.model.enums.CourseField;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,6 +56,15 @@ public interface CourseRepository {
    * @param fields a map of fields that should be updated.
    */
   void update(long courseId, Map<CourseField, Object> fields);
+
+  /**
+   * Updates the students associated with a specific course based on new and existing student IDs.
+   *
+   * @param studentsIds a list of student IDs that should be associated with the course after the
+   *     update.
+   * @return list of students, that exist in database
+   */
+  List<Student> getExistingStudents(List<Long> studentsIds);
 
   /**
    * Updates the students associated with a specific course based on new and existing student IDs.

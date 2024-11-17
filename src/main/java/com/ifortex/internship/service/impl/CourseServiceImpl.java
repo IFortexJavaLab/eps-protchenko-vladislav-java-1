@@ -7,6 +7,7 @@ import com.ifortex.internship.exception.EntityNotFoundException;
 import com.ifortex.internship.mapper.CourseMapper;
 import com.ifortex.internship.mapper.StudentMapper;
 import com.ifortex.internship.model.Course;
+import com.ifortex.internship.model.Student;
 import com.ifortex.internship.model.enums.CourseField;
 import com.ifortex.internship.repository.CourseRepository;
 import com.ifortex.internship.service.CourseService;
@@ -46,7 +47,12 @@ public class CourseServiceImpl implements CourseService {
   @Override
   public CourseDto createCourse(CourseDto courseDto) {
     courseDtoValidator.validateForCreate(courseDto);
+    //    if (courseRepository.getExistingStudentsCount(studentIds) != studentIds.size()) {
+    //      throw new InvalidRequestDataException("Student list is incorrect");
+    //    }
     Course course = courseMapper.toEntity(courseDto);
+    List<Long> studentIds = courseDto.getStudents().stream().map(StudentDto::getId).toList();
+    course.setStudents(courseRepository.getExistingStudents(studentIds));
     course.setLastUpdateDate(LocalDateTime.now());
     return courseMapper.toDto(courseRepository.create(course));
   }
@@ -66,8 +72,11 @@ public class CourseServiceImpl implements CourseService {
     courseRepository.update(courseDto.getId(), getFieldsForUpdate(courseDto));
 
     if (courseDto.getStudents() != null) {
+      List<Long> studentIds = courseDto.getStudents().stream().map(StudentDto::getId).toList();
+      List<Student> existingStudents = courseRepository.getExistingStudents(studentIds);
+      courseDto.setStudents(studentMapper.toDto(existingStudents));
       courseRepository.updateCourseStudents(
-          oldCourseEntity, courseDto.getStudents().stream().map(StudentDto::getId).toList());
+          oldCourseEntity, existingStudents.stream().map(Student::getId).toList());
     }
 
     mapNewDtoFields(oldCourseEntity, courseDto);
@@ -85,31 +94,9 @@ public class CourseServiceImpl implements CourseService {
 
   @Override
   public List<CourseDto> getCoursesWithFilterAndSort(FilterSortDto dto) {
-//    mapEmptyFields(dto);
     List<Course> courses = courseRepository.findWithFiltersAndSort(dto);
     return courseMapper.toDto(courses);
   }
-
-//  private void mapEmptyFields(FilterSortDto dto) {
-//    if (dto.getStudentName() == null) {
-//      dto.setStudentName("");
-//    }
-//    if (dto.getCourseName() == null) {
-//      dto.setCourseName("");
-//    }
-//    if (dto.getCourseDescription() == null) {
-//      dto.setCourseDescription("");
-//    }
-//    if (dto.getSortByDate() == null) {
-//      dto.setSortByDate(SortType.ASC);
-//    }
-//    if (dto.getSortByName() == null) {
-//      dto.setSortByName(SortType.ASC);
-//    }
-//    if (dto.getSortPriority() == null) {
-//      dto.setSortPriority(SortPriority.DATE_FIRST);
-//    }
-//  }
 
   private void mapNewDtoFields(Course oldCourseEntity, CourseDto courseDto) {
     if (courseDto.getName() == null) {

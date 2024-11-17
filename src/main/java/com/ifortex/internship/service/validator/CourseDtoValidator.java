@@ -22,8 +22,6 @@ public class CourseDtoValidator {
   private final int MIN_DURATION = 0;
   private final int MAX_STUDENTS_COUNT = 150;
 
-  private final StudentDtoValidator studentDtoValidator;
-
   public void validateForCreate(CourseDto courseDto) {
     validateName(courseDto.getName());
     validatePrice(courseDto.getPrice());
@@ -108,6 +106,5 @@ public class CourseDtoValidator {
     if (studentList.size() > MAX_STUDENTS_COUNT) {
       throw new CourseIsFullException("Course can't have more than 150 students");
     }
-    studentList.forEach(studentDtoValidator::validate);
   }
 }

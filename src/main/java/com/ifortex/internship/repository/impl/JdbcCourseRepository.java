@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -23,7 +25,13 @@ public class JdbcCourseRepository implements CourseRepository {
 
   private final JdbcTemplate jdbcTemplate;
 
+  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
   private final CourseWithStudentExtractor courseWithStudentExtractor;
+
+  private final RowMapper<Student> studentRowMapper =
+          (rs, rowNum) -> Student.builder().id(rs.getLong("id")).name(rs.getString("name")).build();
+
 
   private final String findAllCoursesSql =
       """
@@ -110,18 +118,6 @@ public class JdbcCourseRepository implements CourseRepository {
     return course;
   }
 
-  private void saveCourseStudents(long courseId, List<Long> studentIds) {
-    String sql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
-    jdbcTemplate.batchUpdate(
-        sql,
-        studentIds,
-        studentIds.size(),
-        (ps, studentId) -> {
-          ps.setLong(1, courseId);
-          ps.setLong(2, studentId);
-        });
-  }
-
   @Override
   public void update(long courseId, Map<CourseField, Object> fieldMap) {
     StringBuilder sqlBuilder = new StringBuilder("UPDATE courses SET ");
@@ -141,8 +137,17 @@ public class JdbcCourseRepository implements CourseRepository {
   }
 
   @Override
+  public List<Student> getExistingStudents(List<Long> studentIds) {
+    if (studentIds.isEmpty()) {
+      return List.of();
+    }
+    String sql = "SELECT * FROM students WHERE id IN (:studentIds)";
+    Map<String, Object> parameters = Map.of("studentIds", studentIds);
+    return new ArrayList<>(namedParameterJdbcTemplate.query(sql, parameters, studentRowMapper));
+  }
+
+  @Override
   public void updateCourseStudents(Course course, List<Long> newStudentIds) {
-    // TODO check students
     String deleteSql = "DELETE FROM m2m_student_course WHERE course_id = ? AND student_id = ?";
     jdbcTemplate.batchUpdate(
         deleteSql,
@@ -171,5 +176,17 @@ public class JdbcCourseRepository implements CourseRepository {
 
     String deleteCourseSql = "DELETE FROM courses WHERE id = ?";
     jdbcTemplate.update(deleteCourseSql, courseId);
+  }
+
+  private void saveCourseStudents(long courseId, List<Long> studentIds) {
+    String sql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
+    jdbcTemplate.batchUpdate(
+        sql,
+        studentIds,
+        studentIds.size(),
+        (ps, studentId) -> {
+          ps.setLong(1, courseId);
+          ps.setLong(2, studentId);
+        });
   }
 }
