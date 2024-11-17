@@ -1,6 +1,7 @@
 package com.ifortex.internship.service;
 
 import com.ifortex.internship.dto.CourseDto;
+import com.ifortex.internship.dto.FilterSortDto;
 import com.ifortex.internship.exception.CourseHasAlreadyStartedException;
 import com.ifortex.internship.exception.CourseIsFullException;
 import com.ifortex.internship.exception.EntityNotFoundException;
@@ -61,4 +62,6 @@ public interface CourseService {
    * @throws EntityNotFoundException if the course with the specified ID does not exist
    */
   void deleteCourse(long id);
+
+  List<CourseDto> getCoursesWithFilterAndSort(FilterSortDto dto);
 }

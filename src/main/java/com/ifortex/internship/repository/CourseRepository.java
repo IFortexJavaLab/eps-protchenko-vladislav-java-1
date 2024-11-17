@@ -1,5 +1,6 @@
 package com.ifortex.internship.repository;
 
+import com.ifortex.internship.dto.FilterSortDto;
 import com.ifortex.internship.model.Course;
 import com.ifortex.internship.model.enums.CourseField;
 
@@ -25,6 +26,14 @@ public interface CourseRepository {
    * @return a list of all courses
    */
   List<Course> findAll();
+
+  /**
+   * Retrieves courses based on applied filters and sorting criteria.
+   *
+   * @param dto the filter and sort criteria encapsulated in a {@link FilterSortDto} object
+   * @return a list of courses matching the filters and sorted according to the provided criteria
+   */
+  List<Course> findWithFiltersAndSort(FilterSortDto dto);
 
   /**
    * Creates a new course in the repository.

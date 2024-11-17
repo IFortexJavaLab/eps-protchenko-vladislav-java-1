@@ -1,6 +1,7 @@
 package com.ifortex.internship.service.impl;
 
 import com.ifortex.internship.dto.CourseDto;
+import com.ifortex.internship.dto.FilterSortDto;
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.EntityNotFoundException;
 import com.ifortex.internship.mapper.CourseMapper;
@@ -27,6 +28,7 @@ public class CourseServiceImpl implements CourseService {
   private final StudentMapper studentMapper;
   private final CourseDtoValidator courseDtoValidator;
 
+  @Override
   public CourseDto getCourse(long id) {
     return courseMapper.toDto(
         courseRepository
@@ -41,6 +43,7 @@ public class CourseServiceImpl implements CourseService {
   }
 
   @Transactional
+  @Override
   public CourseDto createCourse(CourseDto courseDto) {
     courseDtoValidator.validateForCreate(courseDto);
     Course course = courseMapper.toEntity(courseDto);
@@ -49,6 +52,7 @@ public class CourseServiceImpl implements CourseService {
   }
 
   @Transactional
+  @Override
   public CourseDto updateCourse(CourseDto courseDto) {
     Course oldCourseEntity =
         courseRepository
@@ -71,12 +75,41 @@ public class CourseServiceImpl implements CourseService {
   }
 
   @Transactional
+  @Override
   public void deleteCourse(long id) {
     if (courseRepository.findById(id).isEmpty()) {
       throw new EntityNotFoundException(String.format("Course with id %s not found", id));
     }
     courseRepository.delete(id);
   }
+
+  @Override
+  public List<CourseDto> getCoursesWithFilterAndSort(FilterSortDto dto) {
+//    mapEmptyFields(dto);
+    List<Course> courses = courseRepository.findWithFiltersAndSort(dto);
+    return courseMapper.toDto(courses);
+  }
+
+//  private void mapEmptyFields(FilterSortDto dto) {
+//    if (dto.getStudentName() == null) {
+//      dto.setStudentName("");
+//    }
+//    if (dto.getCourseName() == null) {
+//      dto.setCourseName("");
+//    }
+//    if (dto.getCourseDescription() == null) {
+//      dto.setCourseDescription("");
+//    }
+//    if (dto.getSortByDate() == null) {
+//      dto.setSortByDate(SortType.ASC);
+//    }
+//    if (dto.getSortByName() == null) {
+//      dto.setSortByName(SortType.ASC);
+//    }
+//    if (dto.getSortPriority() == null) {
+//      dto.setSortPriority(SortPriority.DATE_FIRST);
+//    }
+//  }
 
   private void mapNewDtoFields(Course oldCourseEntity, CourseDto courseDto) {
     if (courseDto.getName() == null) {

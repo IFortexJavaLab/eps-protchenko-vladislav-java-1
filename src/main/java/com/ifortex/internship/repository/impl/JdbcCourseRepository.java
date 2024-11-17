@@ -1,5 +1,6 @@
 package com.ifortex.internship.repository.impl;
 
+import com.ifortex.internship.dto.FilterSortDto;
 import com.ifortex.internship.model.Course;
 import com.ifortex.internship.model.Student;
 import com.ifortex.internship.model.enums.CourseField;
@@ -46,6 +47,41 @@ public class JdbcCourseRepository implements CourseRepository {
   @Override
   public List<Course> findAll() {
     return jdbcTemplate.query(findAllCoursesSql, courseWithStudentExtractor);
+  }
+
+  @Override
+  public List<Course> findWithFiltersAndSort(FilterSortDto dto) {
+    StringBuilder sqlBuilder = new StringBuilder(findAllCoursesSql).append(" WHERE 1=1");
+    List<Object> values = new ArrayList<>();
+
+    if (dto.getStudentName() != null) {
+      sqlBuilder.append(" AND LOWER(s.name) LIKE LOWER(?)");
+      values.add("%" + dto.getStudentName() + "%");
+    }
+    if (dto.getCourseName() != null) {
+      sqlBuilder.append(" AND LOWER(c.name) LIKE LOWER(?)");
+      values.add("%" + dto.getCourseName() + "%");
+    }
+    if (dto.getCourseDescription() != null) {
+      sqlBuilder.append(" AND LOWER(c.description) LIKE LOWER(?)");
+      values.add("%" + dto.getCourseDescription() + "%");
+    }
+
+    boolean hasSort = false;
+    if (dto.getSortByDate() != null) {
+      sqlBuilder.append(" ORDER BY c.start_date ").append(dto.getSortByDate().name().toUpperCase());
+      hasSort = true;
+    }
+
+    if (dto.getSortByName() != null) {
+      if (hasSort) {
+        sqlBuilder.append(", ");
+      } else {
+        sqlBuilder.append(" ORDER BY ");
+      }
+      sqlBuilder.append("c.name ").append(dto.getSortByName().name().toUpperCase());
+    }
+    return jdbcTemplate.query(sqlBuilder.toString(), courseWithStudentExtractor, values.toArray());
   }
 
   @Override
@@ -106,6 +142,7 @@ public class JdbcCourseRepository implements CourseRepository {
 
   @Override
   public void updateCourseStudents(Course course, List<Long> newStudentIds) {
+    // TODO check students
     String deleteSql = "DELETE FROM m2m_student_course WHERE course_id = ? AND student_id = ?";
     jdbcTemplate.batchUpdate(
         deleteSql,
