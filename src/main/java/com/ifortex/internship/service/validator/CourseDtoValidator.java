@@ -4,7 +4,7 @@ import com.ifortex.internship.dto.CourseDto;
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.CourseHasAlreadyStartedException;
 import com.ifortex.internship.exception.CourseIsFullException;
-import com.ifortex.internship.exception.ErrorCode;
+import com.ifortex.internship.exception.enums.ErrorCode;
 import com.ifortex.internship.exception.InvalidRequestDataException;
 import com.ifortex.internship.model.Course;
 import java.math.BigDecimal;

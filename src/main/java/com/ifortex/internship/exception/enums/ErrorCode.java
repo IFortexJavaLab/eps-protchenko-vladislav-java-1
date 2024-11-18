@@ -1,4 +1,4 @@
-package com.ifortex.internship.exception;
+package com.ifortex.internship.exception.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

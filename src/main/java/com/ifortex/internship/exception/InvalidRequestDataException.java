@@ -1,5 +1,6 @@
 package com.ifortex.internship.exception;
 
+import com.ifortex.internship.exception.enums.ErrorCode;
 import lombok.Getter;
 
 @Getter

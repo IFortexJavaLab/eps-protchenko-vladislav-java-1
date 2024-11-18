@@ -2,7 +2,7 @@ package com.ifortex.internship.service.impl;
 
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.EntityNotFoundException;
-import com.ifortex.internship.exception.ErrorCode;
+import com.ifortex.internship.exception.enums.ErrorCode;
 import com.ifortex.internship.mapper.StudentMapper;
 import com.ifortex.internship.model.Student;
 import com.ifortex.internship.repository.StudentRepository;

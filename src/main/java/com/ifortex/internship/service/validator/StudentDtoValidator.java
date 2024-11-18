@@ -1,7 +1,7 @@
 package com.ifortex.internship.service.validator;
 
 import com.ifortex.internship.dto.StudentDto;
-import com.ifortex.internship.exception.ErrorCode;
+import com.ifortex.internship.exception.enums.ErrorCode;
 import com.ifortex.internship.exception.InvalidRequestDataException;
 import org.springframework.stereotype.Component;
 

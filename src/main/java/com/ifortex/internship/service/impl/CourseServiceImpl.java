@@ -4,7 +4,7 @@ import com.ifortex.internship.dto.CourseDto;
 import com.ifortex.internship.dto.FilterSortDto;
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.EntityNotFoundException;
-import com.ifortex.internship.exception.ErrorCode;
+import com.ifortex.internship.exception.enums.ErrorCode;
 import com.ifortex.internship.mapper.CourseMapper;
 import com.ifortex.internship.mapper.StudentMapper;
 import com.ifortex.internship.model.Course;
