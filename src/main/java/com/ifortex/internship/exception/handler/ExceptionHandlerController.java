@@ -1,4 +1,4 @@
-package com.ifortex.internship.controller;
+package com.ifortex.internship.exception.handler;
 
 import com.ifortex.internship.dto.ErrorResponseDto;
 import com.ifortex.internship.exception.CourseHasAlreadyStartedException;
