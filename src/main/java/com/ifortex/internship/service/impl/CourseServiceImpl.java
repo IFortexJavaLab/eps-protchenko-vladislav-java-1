@@ -1,11 +1,13 @@
 package com.ifortex.internship.service.impl;
 
 import com.ifortex.internship.dto.CourseDto;
+import com.ifortex.internship.dto.FilterSortDto;
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.EntityNotFoundException;
 import com.ifortex.internship.mapper.CourseMapper;
 import com.ifortex.internship.mapper.StudentMapper;
 import com.ifortex.internship.model.Course;
+import com.ifortex.internship.model.Student;
 import com.ifortex.internship.model.enums.CourseField;
 import com.ifortex.internship.repository.CourseRepository;
 import com.ifortex.internship.service.CourseService;
@@ -27,6 +29,7 @@ public class CourseServiceImpl implements CourseService {
   private final StudentMapper studentMapper;
   private final CourseDtoValidator courseDtoValidator;
 
+  @Override
   public CourseDto getCourse(long id) {
     return courseMapper.toDto(
         courseRepository
@@ -41,14 +44,18 @@ public class CourseServiceImpl implements CourseService {
   }
 
   @Transactional
+  @Override
   public CourseDto createCourse(CourseDto courseDto) {
     courseDtoValidator.validateForCreate(courseDto);
     Course course = courseMapper.toEntity(courseDto);
+    List<Long> studentIds = courseDto.getStudents().stream().map(StudentDto::getId).toList();
+    course.setStudents(courseRepository.getExistingStudents(studentIds));
     course.setLastUpdateDate(LocalDateTime.now());
     return courseMapper.toDto(courseRepository.create(course));
   }
 
   @Transactional
+  @Override
   public CourseDto updateCourse(CourseDto courseDto) {
     Course oldCourseEntity =
         courseRepository
@@ -62,8 +69,11 @@ public class CourseServiceImpl implements CourseService {
     courseRepository.update(courseDto.getId(), getFieldsForUpdate(courseDto));
 
     if (courseDto.getStudents() != null) {
+      List<Long> studentIds = courseDto.getStudents().stream().map(StudentDto::getId).toList();
+      List<Student> existingStudents = courseRepository.getExistingStudents(studentIds);
+      courseDto.setStudents(studentMapper.toDto(existingStudents));
       courseRepository.updateCourseStudents(
-          oldCourseEntity, courseDto.getStudents().stream().map(StudentDto::getId).toList());
+          oldCourseEntity, existingStudents.stream().map(Student::getId).toList());
     }
 
     mapNewDtoFields(oldCourseEntity, courseDto);
@@ -71,11 +81,18 @@ public class CourseServiceImpl implements CourseService {
   }
 
   @Transactional
+  @Override
   public void deleteCourse(long id) {
     if (courseRepository.findById(id).isEmpty()) {
       throw new EntityNotFoundException(String.format("Course with id %s not found", id));
     }
     courseRepository.delete(id);
+  }
+
+  @Override
+  public List<CourseDto> getCoursesWithFilterAndSort(FilterSortDto dto) {
+    List<Course> courses = courseRepository.findWithFiltersAndSort(dto);
+    return courseMapper.toDto(courses);
   }
 
   private void mapNewDtoFields(Course oldCourseEntity, CourseDto courseDto) {

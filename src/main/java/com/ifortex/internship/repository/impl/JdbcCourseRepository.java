@@ -1,5 +1,6 @@
 package com.ifortex.internship.repository.impl;
 
+import com.ifortex.internship.dto.FilterSortDto;
 import com.ifortex.internship.model.Course;
 import com.ifortex.internship.model.Student;
 import com.ifortex.internship.model.enums.CourseField;
@@ -10,8 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -23,6 +26,9 @@ public class JdbcCourseRepository implements CourseRepository {
   private final JdbcTemplate jdbcTemplate;
 
   private final CourseWithStudentExtractor courseWithStudentExtractor;
+
+  private final RowMapper<Student> studentRowMapper =
+      (rs, rowNum) -> Student.builder().id(rs.getLong("id")).name(rs.getString("name")).build();
 
   private final String findAllCoursesSql =
       """
@@ -46,6 +52,38 @@ public class JdbcCourseRepository implements CourseRepository {
   @Override
   public List<Course> findAll() {
     return jdbcTemplate.query(findAllCoursesSql, courseWithStudentExtractor);
+  }
+
+  @Override
+  public List<Course> findWithFiltersAndSort(FilterSortDto dto) {
+    StringBuilder sqlBuilder = new StringBuilder(findAllCoursesSql).append(" WHERE 1=1");
+    List<Object> values = new ArrayList<>();
+
+    if (dto.getStudentName() != null) {
+      sqlBuilder.append(" AND LOWER(s.name) LIKE LOWER(?)");
+      values.add("%" + dto.getStudentName() + "%");
+    }
+    if (dto.getCourseName() != null) {
+      sqlBuilder.append(" AND LOWER(c.name) LIKE LOWER(?)");
+      values.add("%" + dto.getCourseName() + "%");
+    }
+    if (dto.getCourseDescription() != null) {
+      sqlBuilder.append(" AND LOWER(c.description) LIKE LOWER(?)");
+      values.add("%" + dto.getCourseDescription() + "%");
+    }
+
+    boolean hasSort = false;
+    if (dto.getSortByDate() != null) {
+      sqlBuilder.append(" ORDER BY c.start_date ").append(dto.getSortByDate().name().toUpperCase());
+      hasSort = true;
+    }
+    if (dto.getSortByName() != null) {
+      sqlBuilder
+          .append(hasSort ? ", " : " ORDER BY ")
+          .append("c.name ")
+          .append(dto.getSortByName().name().toUpperCase());
+    }
+    return jdbcTemplate.query(sqlBuilder.toString(), courseWithStudentExtractor, values.toArray());
   }
 
   @Override
@@ -74,18 +112,6 @@ public class JdbcCourseRepository implements CourseRepository {
     return course;
   }
 
-  private void saveCourseStudents(long courseId, List<Long> studentIds) {
-    String sql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
-    jdbcTemplate.batchUpdate(
-        sql,
-        studentIds,
-        studentIds.size(),
-        (ps, studentId) -> {
-          ps.setLong(1, courseId);
-          ps.setLong(2, studentId);
-        });
-  }
-
   @Override
   public void update(long courseId, Map<CourseField, Object> fieldMap) {
     StringBuilder sqlBuilder = new StringBuilder("UPDATE courses SET ");
@@ -102,6 +128,17 @@ public class JdbcCourseRepository implements CourseRepository {
     values.add(courseId);
 
     jdbcTemplate.update(sqlBuilder.toString(), values.toArray());
+  }
+
+  @Override
+  public List<Student> getExistingStudents(List<Long> studentIds) {
+    if (studentIds.isEmpty()) {
+      return List.of();
+    }
+    String placeholders =
+        studentIds.stream().map(id -> "?").collect(Collectors.joining(", ", "(", ")"));
+    String sql = "SELECT * FROM students WHERE id IN " + placeholders;
+    return jdbcTemplate.query(sql, studentRowMapper, studentIds.toArray());
   }
 
   @Override
@@ -134,5 +171,17 @@ public class JdbcCourseRepository implements CourseRepository {
 
     String deleteCourseSql = "DELETE FROM courses WHERE id = ?";
     jdbcTemplate.update(deleteCourseSql, courseId);
+  }
+
+  private void saveCourseStudents(long courseId, List<Long> studentIds) {
+    String sql = "INSERT INTO m2m_student_course (course_id, student_id) VALUES (?, ?)";
+    jdbcTemplate.batchUpdate(
+        sql,
+        studentIds,
+        studentIds.size(),
+        (ps, studentId) -> {
+          ps.setLong(1, courseId);
+          ps.setLong(2, studentId);
+        });
   }
 }

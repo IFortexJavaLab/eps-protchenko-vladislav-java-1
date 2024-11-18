@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.dao.DataAccessException;
@@ -18,7 +18,7 @@ public class CourseWithStudentExtractor implements ResultSetExtractor<List<Cours
 
   @Override
   public List<Course> extractData(ResultSet rs) throws SQLException, DataAccessException {
-    Map<Long, Course> courseMap = new HashMap<>();
+    Map<Long, Course> courseMap = new LinkedHashMap<>();
 
     while (rs.next()) {
       long courseId = rs.getInt("course_id");
