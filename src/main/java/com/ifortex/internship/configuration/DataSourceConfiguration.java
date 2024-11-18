@@ -2,16 +2,13 @@ package com.ifortex.internship.configuration;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
+import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-
-import javax.sql.DataSource;
 
 @Configuration
 public class DataSourceConfiguration {
@@ -30,12 +27,7 @@ public class DataSourceConfiguration {
   public JdbcTemplate jdbcTemplate(DataSource dataSource) {
     return new JdbcTemplate(dataSource);
   }
-
-  @Bean
-  public NamedParameterJdbcTemplate namedParameterJdbcTemplate(DataSource dataSource) {
-    return new NamedParameterJdbcTemplate(dataSource);
-  }
-
+  
   @Bean(initMethod = "migrate")
   public Flyway flyway(DataSource dataSource) {
     return Flyway.configure()
