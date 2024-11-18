@@ -1,5 +1,8 @@
 package com.ifortex.internship.model.enums;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public enum CourseField {
   NAME("name"),
   DESCRIPTION("description"),
@@ -11,7 +14,4 @@ public enum CourseField {
 
   private final String name;
 
-  CourseField(String name) {
-    this.name = name;
-  }
 }

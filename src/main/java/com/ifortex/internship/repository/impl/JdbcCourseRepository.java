@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -137,14 +138,10 @@ public class JdbcCourseRepository implements CourseRepository {
     if (studentIds.isEmpty()) {
       return List.of();
     }
-    String sql = "SELECT * FROM students WHERE id IN (:studentIds)";
-    Map<String, Object> parameters = Map.of("studentIds", studentIds);
-
-    StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM students WHERE id IN (");
-    sqlBuilder.append(String.join(", ", studentIds.stream().map(Object::toString).toList()));
-    sqlBuilder.append(")");
-
-    return new ArrayList<>(namedParameterJdbcTemplate.query(sql, parameters, studentRowMapper));
+    String placeholders =
+        studentIds.stream().map(id -> "?").collect(Collectors.joining(", ", "(", ")"));
+    String sql = "SELECT * FROM students WHERE id IN " + placeholders;
+    return jdbcTemplate.query(sql, studentRowMapper, studentIds.toArray());
   }
 
   @Override
