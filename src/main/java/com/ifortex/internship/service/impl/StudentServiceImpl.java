@@ -2,6 +2,7 @@ package com.ifortex.internship.service.impl;
 
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.EntityNotFoundException;
+import com.ifortex.internship.exception.ErrorCode;
 import com.ifortex.internship.mapper.StudentMapper;
 import com.ifortex.internship.model.Student;
 import com.ifortex.internship.repository.StudentRepository;
@@ -30,6 +31,7 @@ public class StudentServiceImpl implements StudentService {
             .orElseThrow(
                 () ->
                     new EntityNotFoundException(
+                        ErrorCode.STUDENT_NOT_FOUND,
                         String.format("Student with id=%d not found", id))));
   }
 
@@ -51,7 +53,9 @@ public class StudentServiceImpl implements StudentService {
   public StudentDto updateStudent(StudentDto studentDto) {
     studentDtoValidator.validate(studentDto);
     if (studentRepository.findById(studentDto.getId()).isEmpty()) {
-      throw new EntityNotFoundException(String.format("Student with id=%d not found", studentDto.getId()));
+      throw new EntityNotFoundException(
+          ErrorCode.STUDENT_NOT_FOUND,
+          String.format("Student with id=%d not found", studentDto.getId()));
     }
     studentRepository.update(studentMapper.toEntity(studentDto));
     return studentDto;
@@ -61,7 +65,8 @@ public class StudentServiceImpl implements StudentService {
   @Override
   public void deleteStudent(long id) {
     if (studentRepository.findById(id).isEmpty()) {
-      throw new EntityNotFoundException(String.format("Student with id=%d not found", id));
+      throw new EntityNotFoundException(
+          ErrorCode.STUDENT_NOT_FOUND, String.format("Student with id=%d not found", id));
     }
     studentRepository.delete(id);
   }
