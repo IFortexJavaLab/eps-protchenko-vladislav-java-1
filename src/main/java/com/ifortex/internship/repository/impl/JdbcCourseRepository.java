@@ -68,7 +68,7 @@ public class JdbcCourseRepository implements CourseRepository {
             LEFT JOIN m2m_student_course m_inner ON c_inner.id = m_inner.course_id
             LEFT JOIN students s_inner ON m_inner.student_id = s_inner.id
             WHERE LOWER(s_inner.name) LIKE LOWER(?)
-        );
+        )
         """);
       values.add("%" + dto.getStudentName() + "%");
     }
@@ -92,6 +92,7 @@ public class JdbcCourseRepository implements CourseRepository {
           .append("c.name ")
           .append(dto.getSortByName().name().toUpperCase());
     }
+    sqlBuilder.append(";");
     return jdbcTemplate.query(sqlBuilder.toString(), courseWithStudentExtractor, values.toArray());
   }
 

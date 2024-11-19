@@ -51,8 +51,10 @@ public class CourseServiceImpl implements CourseService {
   public CourseDto createCourse(CourseDto courseDto) {
     courseDtoValidator.validateForCreate(courseDto);
     Course course = courseMapper.toEntity(courseDto);
-    List<Long> studentIds = courseDto.getStudents().stream().map(StudentDto::getId).toList();
-    course.setStudents(courseRepository.getExistingStudents(studentIds));
+    if (courseDto.getStudents() != null) {
+      List<Long> studentIds = courseDto.getStudents().stream().map(StudentDto::getId).toList();
+      course.setStudents(courseRepository.getExistingStudents(studentIds));
+    }
     course.setLastUpdateDate(LocalDateTime.now());
     return courseMapper.toDto(courseRepository.create(course));
   }

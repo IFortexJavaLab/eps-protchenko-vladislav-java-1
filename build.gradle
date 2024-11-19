@@ -23,6 +23,7 @@ ext {
     jakartaValidationVersion = '3.1.0'
     junitVersion = '5.11.3'
     mockitoVersion = '5.14.2'
+    janinoVersion = '3.1.12'
 }
 
 dependencies {
@@ -33,6 +34,7 @@ dependencies {
     implementation "org.postgresql:postgresql:$postgresqlDriverVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
     implementation "ch.qos.logback:logback-classic:$loggerVersion"
+    implementation "org.codehaus.janino:janino:$janinoVersion"
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:$jakartaServletApiVersion"
     compileOnly "org.projectlombok:lombok:$lombokVersion"

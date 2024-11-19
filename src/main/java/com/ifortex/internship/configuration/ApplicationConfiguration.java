@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @ComponentScan("com.ifortex.internship")
 @PropertySource(
-    value = {"classpath:application-${envTarget:dev}.yml"},
+    value = {"classpath:application-${envTarget:prod}.yml"},
     factory = YamlPropertySourceFactory.class)
 @EnableTransactionManagement
 @EnableScheduling
