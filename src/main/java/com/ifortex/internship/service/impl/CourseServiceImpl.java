@@ -4,6 +4,7 @@ import com.ifortex.internship.dto.CourseDto;
 import com.ifortex.internship.dto.FilterSortDto;
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.EntityNotFoundException;
+import com.ifortex.internship.exception.enums.ErrorCode;
 import com.ifortex.internship.mapper.CourseMapper;
 import com.ifortex.internship.mapper.StudentMapper;
 import com.ifortex.internship.model.Course;
@@ -36,7 +37,9 @@ public class CourseServiceImpl implements CourseService {
             .findById(id)
             .orElseThrow(
                 () ->
-                    new EntityNotFoundException(String.format("Course with id %s not found", id))));
+                    new EntityNotFoundException(
+                        ErrorCode.COURSE_NOT_FOUND,
+                        String.format("Course with id %s not found", id))));
   }
 
   public List<CourseDto> getAllCourses() {
@@ -63,6 +66,7 @@ public class CourseServiceImpl implements CourseService {
             .orElseThrow(
                 () ->
                     new EntityNotFoundException(
+                        ErrorCode.COURSE_NOT_FOUND,
                         String.format("Course with id %s not found", courseDto.getId())));
     courseDto.setLastUpdateDate(LocalDateTime.now());
     courseDtoValidator.validateForUpdate(courseDto, oldCourseEntity);
@@ -84,7 +88,8 @@ public class CourseServiceImpl implements CourseService {
   @Override
   public void deleteCourse(long id) {
     if (courseRepository.findById(id).isEmpty()) {
-      throw new EntityNotFoundException(String.format("Course with id %s not found", id));
+      throw new EntityNotFoundException(
+          ErrorCode.COURSE_NOT_FOUND, String.format("Course with id %s not found", id));
     }
     courseRepository.delete(id);
   }

@@ -1,6 +1,7 @@
 package com.ifortex.internship.service.validator;
 
 import com.ifortex.internship.dto.StudentDto;
+import com.ifortex.internship.exception.enums.ErrorCode;
 import com.ifortex.internship.exception.InvalidRequestDataException;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,8 @@ public class StudentDtoValidator {
             && name.trim().length() <= MAX_NAME_LENGTH;
     boolean isNameInvalid = !isNameProvided || !isNameLengthValid;
     if (isNameInvalid) {
-      throw new InvalidRequestDataException("Invalid student name");
+      throw new InvalidRequestDataException(
+          ErrorCode.INVALID_STUDENT_REQUEST_DATA, "Invalid student name");
     }
   }
 }

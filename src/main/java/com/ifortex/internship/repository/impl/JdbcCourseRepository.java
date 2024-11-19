@@ -60,7 +60,16 @@ public class JdbcCourseRepository implements CourseRepository {
     List<Object> values = new ArrayList<>();
 
     if (dto.getStudentName() != null) {
-      sqlBuilder.append(" AND LOWER(s.name) LIKE LOWER(?)");
+      sqlBuilder.append(
+          """
+         AND c.id IN (
+            SELECT DISTINCT c_inner.id
+            FROM courses c_inner
+            LEFT JOIN m2m_student_course m_inner ON c_inner.id = m_inner.course_id
+            LEFT JOIN students s_inner ON m_inner.student_id = s_inner.id
+            WHERE LOWER(s_inner.name) LIKE LOWER(?)
+        );
+        """);
       values.add("%" + dto.getStudentName() + "%");
     }
     if (dto.getCourseName() != null) {
