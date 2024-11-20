@@ -2,6 +2,7 @@ package com.ifortex.internship.exception.handler;
 
 import com.ifortex.internship.dto.ErrorResponseDto;
 import com.ifortex.internship.exception.CourseHasAlreadyStartedException;
+import com.ifortex.internship.exception.CourseIsClosedException;
 import com.ifortex.internship.exception.CourseIsFullException;
 import com.ifortex.internship.exception.EntityNotFoundException;
 import com.ifortex.internship.exception.InvalidRequestDataException;
@@ -35,6 +36,12 @@ public class ExceptionHandlerController {
 
   @ExceptionHandler(CourseIsFullException.class)
   public ResponseEntity<ErrorResponseDto> handleCourseIsFullException(CourseIsFullException e) {
+    ErrorResponseDto dto = new ErrorResponseDto(e.getMessage(), e.getCode().getValue());
+    return new ResponseEntity<>(dto, HttpStatus.NOT_ACCEPTABLE);
+  }
+
+  @ExceptionHandler(CourseIsClosedException.class)
+  public ResponseEntity<ErrorResponseDto> handleCourseIsClosedException(CourseIsClosedException e) {
     ErrorResponseDto dto = new ErrorResponseDto(e.getMessage(), e.getCode().getValue());
     return new ResponseEntity<>(dto, HttpStatus.NOT_ACCEPTABLE);
   }

@@ -3,6 +3,7 @@ package com.ifortex.internship.service.validator;
 import com.ifortex.internship.dto.CourseDto;
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.CourseHasAlreadyStartedException;
+import com.ifortex.internship.exception.CourseIsClosedException;
 import com.ifortex.internship.exception.CourseIsFullException;
 import com.ifortex.internship.exception.InvalidRequestDataException;
 import com.ifortex.internship.exception.enums.ErrorCode;
@@ -37,6 +38,9 @@ public class CourseDtoValidator {
   }
 
   public void validateForUpdate(CourseDto courseDto, Course course) {
+    if (!course.isOpen()) {
+      throw new CourseIsClosedException(ErrorCode.COURSE_IS_CLOSED, "Course is closed");
+    }
     if (courseDto.getName() != null) {
       validateName(courseDto.getName());
     }

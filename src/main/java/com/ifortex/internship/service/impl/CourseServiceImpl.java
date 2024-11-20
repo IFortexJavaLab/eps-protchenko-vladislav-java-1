@@ -49,6 +49,7 @@ public class CourseServiceImpl implements CourseService {
   @Transactional
   @Override
   public CourseDto createCourse(CourseDto courseDto) {
+    courseDto.setIsOpen(true);
     courseDtoValidator.validateForCreate(courseDto);
     Course course = courseMapper.toEntity(courseDto);
     if (courseDto.getStudents() != null) {
