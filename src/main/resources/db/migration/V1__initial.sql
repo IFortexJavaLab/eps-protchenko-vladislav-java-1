@@ -28,13 +28,14 @@ $$
     BEGIN
         FOR i IN 1..1000
             LOOP
-                INSERT INTO courses(name, description, price, duration, start_date, last_update_date)
+                INSERT INTO courses(name, description, price, duration, start_date, last_update_date, is_open)
                 VALUES ('Course ' || i,
                         'Description for course ' || i,
                         random() * 100,
                         floor(random() * 100) + 10,
+                        now() + (floor(random() * 30 + 1)) * INTERVAL '1 day',
                         now(),
-                        now());
+                        true);
             END LOOP;
     END
 $$;

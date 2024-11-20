@@ -17,6 +17,8 @@ public enum ErrorCode {
 
     COURSE_HAS_ALREADY_STARTED(40602),
 
+    COURSE_IS_CLOSED(40602),
+
     COURSE_IS_FULL(40602);
 
     private final int value;
