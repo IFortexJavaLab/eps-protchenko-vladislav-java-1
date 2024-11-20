@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: education_system_db
+    ports: 
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ifortex
+      POSTGRES_PASSWORD: ifortex
+      POSTGRES_DB: education_db
+      POSTGRES_DBINIT_ARGS: "--encoding=UTF8 --locale=en_US.UTF8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    driver: local

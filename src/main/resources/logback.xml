@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <if condition='property("envTarget").equalsIgnoreCase("dev")'>
+        <then>
+            <include resource="logback-dev.xml" />
+        </then>
+        <else>
+            <include resource="logback-prod.xml" />
+        </else>
+    </if>
+</configuration>
