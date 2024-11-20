@@ -1,5 +1,11 @@
 package com.ifortex.intership;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.ifortex.internship.dto.CourseDto;
 import com.ifortex.internship.dto.FilterSortDto;
 import com.ifortex.internship.exception.EntityNotFoundException;
@@ -11,12 +17,10 @@ import com.ifortex.internship.service.validator.CourseDtoValidator;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class CourseServiceImplTest {
@@ -53,77 +57,77 @@ public class CourseServiceImplTest {
 
   @Test
   void testGetCourse_ShouldReturnCourse_WhenCourseExists() {
-    Mockito.when(courseRepository.findById(1L)).thenReturn(Optional.of(mockCourse));
-    Mockito.when(courseMapper.toDto(mockCourse)).thenReturn(mockCourseDto);
+    when(courseRepository.findById(1L)).thenReturn(Optional.of(mockCourse));
+    when(courseMapper.toDto(mockCourse)).thenReturn(mockCourseDto);
 
     CourseDto result = courseService.getCourse(1L);
 
-    Assertions.assertNotNull(result);
-    Assertions.assertEquals(mockCourseDto.getId(), result.getId());
-    Assertions.assertEquals(mockCourseDto.getName(), result.getName());
-    Mockito.verify(courseRepository).findById(1L);
-    Mockito.verify(courseMapper).toDto(mockCourse);
+    assertNotNull(result);
+    assertEquals(mockCourseDto.getId(), result.getId());
+    assertEquals(mockCourseDto.getName(), result.getName());
+    verify(courseRepository).findById(1L);
+    verify(courseMapper).toDto(mockCourse);
   }
 
   @Test
   void testGetCourse_ShouldThrowEntityNotFoundException_WhenCourseDoesNotExist() {
-    Mockito.when(courseRepository.findById(1L)).thenReturn(Optional.empty());
+    when(courseRepository.findById(1L)).thenReturn(Optional.empty());
 
     EntityNotFoundException exception =
-        Assertions.assertThrows(EntityNotFoundException.class, () -> courseService.getCourse(1L));
+        assertThrows(EntityNotFoundException.class, () -> courseService.getCourse(1L));
 
-    Assertions.assertEquals("Course with id 1 not found", exception.getMessage());
-    Mockito.verify(courseRepository).findById(1L);
+    assertEquals("Course with id 1 not found", exception.getMessage());
+    verify(courseRepository).findById(1L);
   }
 
   @Test
   void testCreateCourse_ShouldReturnCreatedCourse() {
-    Mockito.when(courseMapper.toEntity(mockCourseDto)).thenReturn(mockCourse);
-    Mockito.when(courseRepository.create(mockCourse)).thenReturn(mockCourse);
-    Mockito.when(courseMapper.toDto(mockCourse)).thenReturn(mockCourseDto);
+    when(courseMapper.toEntity(mockCourseDto)).thenReturn(mockCourse);
+    when(courseRepository.create(mockCourse)).thenReturn(mockCourse);
+    when(courseMapper.toDto(mockCourse)).thenReturn(mockCourseDto);
 
     CourseDto result = courseService.createCourse(mockCourseDto);
 
-    Assertions.assertNotNull(result);
-    Assertions.assertEquals(mockCourseDto.getId(), result.getId());
-    Mockito.verify(courseDtoValidator).validateForCreate(mockCourseDto);
-    Mockito.verify(courseMapper).toEntity(mockCourseDto);
-    Mockito.verify(courseRepository).create(mockCourse);
-    Mockito.verify(courseMapper).toDto(mockCourse);
+    assertNotNull(result);
+    assertEquals(mockCourseDto.getId(), result.getId());
+    verify(courseDtoValidator).validateForCreate(mockCourseDto);
+    verify(courseMapper).toEntity(mockCourseDto);
+    verify(courseRepository).create(mockCourse);
+    verify(courseMapper).toDto(mockCourse);
   }
 
   @Test
   void testUpdateCourse_ShouldThrowEntityNotFoundException_WhenCourseDoesNotExist() {
-    Mockito.when(courseRepository.findById(mockCourseDto.getId())).thenReturn(Optional.empty());
+    when(courseRepository.findById(mockCourseDto.getId())).thenReturn(Optional.empty());
 
     EntityNotFoundException exception =
-        Assertions.assertThrows(
+        assertThrows(
             EntityNotFoundException.class, () -> courseService.updateCourse(mockCourseDto));
 
-    Assertions.assertEquals("Course with id 1 not found", exception.getMessage());
-    Mockito.verify(courseRepository).findById(mockCourseDto.getId());
+    assertEquals("Course with id 1 not found", exception.getMessage());
+    verify(courseRepository).findById(mockCourseDto.getId());
   }
 
   @Test
   void testDeleteCourse_ShouldDeleteCourse_WhenCourseExists() {
-    Mockito.when(courseRepository.findById(1L)).thenReturn(Optional.of(mockCourse));
+    when(courseRepository.findById(1L)).thenReturn(Optional.of(mockCourse));
 
     courseService.deleteCourse(1L);
 
-    Mockito.verify(courseRepository).findById(1L);
-    Mockito.verify(courseRepository).delete(1L);
+    verify(courseRepository).findById(1L);
+    verify(courseRepository).delete(1L);
   }
 
   @Test
   void testDeleteCourse_ShouldThrowEntityNotFoundException_WhenCourseDoesNotExist() {
-    Mockito.when(courseRepository.findById(1L)).thenReturn(Optional.empty());
+    when(courseRepository.findById(1L)).thenReturn(Optional.empty());
 
     EntityNotFoundException exception =
-        Assertions.assertThrows(
+        assertThrows(
             EntityNotFoundException.class, () -> courseService.deleteCourse(1L));
 
-    Assertions.assertEquals("Course with id 1 not found", exception.getMessage());
-    Mockito.verify(courseRepository).findById(1L);
+    assertEquals("Course with id 1 not found", exception.getMessage());
+    verify(courseRepository).findById(1L);
   }
 
   @Test
@@ -132,15 +136,15 @@ public class CourseServiceImplTest {
     List<Course> courseList = List.of(mockCourse);
     List<CourseDto> courseDtoList = List.of(mockCourseDto);
 
-    Mockito.when(courseRepository.findWithFiltersAndSort(filterSortDto)).thenReturn(courseList);
-    Mockito.when(courseMapper.toDto(courseList)).thenReturn(courseDtoList);
+    when(courseRepository.findWithFiltersAndSort(filterSortDto)).thenReturn(courseList);
+    when(courseMapper.toDto(courseList)).thenReturn(courseDtoList);
 
     List<CourseDto> result = courseService.getCoursesWithFilterAndSort(filterSortDto);
 
-    Assertions.assertNotNull(result);
-    Assertions.assertEquals(1, result.size());
-    Assertions.assertEquals(mockCourseDto.getId(), result.get(0).getId());
-    Mockito.verify(courseRepository).findWithFiltersAndSort(filterSortDto);
-    Mockito.verify(courseMapper).toDto(courseList);
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertEquals(mockCourseDto.getId(), result.get(0).getId());
+    verify(courseRepository).findWithFiltersAndSort(filterSortDto);
+    verify(courseMapper).toDto(courseList);
   }
 }

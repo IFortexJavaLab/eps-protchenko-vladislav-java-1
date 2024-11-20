@@ -1,5 +1,13 @@
 package com.ifortex.intership;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.EntityNotFoundException;
 import com.ifortex.internship.mapper.StudentMapper;
@@ -9,12 +17,10 @@ import com.ifortex.internship.service.impl.StudentServiceImpl;
 import com.ifortex.internship.service.validator.StudentDtoValidator;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class StudentServiceImplTest {
@@ -38,30 +44,30 @@ public class StudentServiceImplTest {
     Student student = Student.builder().id(studentId).build();
     StudentDto studentDto = new StudentDto().setId(studentId);
 
-    Mockito.when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
-    Mockito.when(studentMapper.toDto(student)).thenReturn(studentDto);
+    when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
+    when(studentMapper.toDto(student)).thenReturn(studentDto);
 
     StudentDto result = studentService.getStudent(studentId);
 
-    Assertions.assertNotNull(result);
-    Assertions.assertEquals(studentId, result.getId());
-    Mockito.verify(studentRepository).findById(studentId);
-    Mockito.verify(studentMapper).toDto(student);
+    assertNotNull(result);
+    assertEquals(studentId, result.getId());
+    verify(studentRepository).findById(studentId);
+    verify(studentMapper).toDto(student);
   }
 
   @Test
   void testGetStudent_ShouldThrowException_WhenNotFound() {
     long studentId = 1L;
 
-    Mockito.when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
+    when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
     EntityNotFoundException exception =
-        Assertions.assertThrows(
+        assertThrows(
             EntityNotFoundException.class, () -> studentService.getStudent(studentId));
 
-    Assertions.assertEquals("Student with id 1 not found", exception.getMessage());
-    Mockito.verify(studentRepository).findById(studentId);
-    Mockito.verifyNoInteractions(studentMapper);
+    assertEquals("Student with id 1 not found", exception.getMessage());
+    verify(studentRepository).findById(studentId);
+    verifyNoInteractions(studentMapper);
   }
 
   @Test
@@ -69,15 +75,15 @@ public class StudentServiceImplTest {
     List<Student> studentList = List.of(Student.builder().build());
     List<StudentDto> studentDtoList = List.of(new StudentDto());
 
-    Mockito.when(studentRepository.findAll()).thenReturn(studentList);
-    Mockito.when(studentMapper.toDto(studentList)).thenReturn(studentDtoList);
+    when(studentRepository.findAll()).thenReturn(studentList);
+    when(studentMapper.toDto(studentList)).thenReturn(studentDtoList);
 
     List<StudentDto> result = studentService.getAllStudents();
 
-    Assertions.assertNotNull(result);
-    Assertions.assertEquals(studentDtoList.size(), result.size());
-    Mockito.verify(studentRepository).findAll();
-    Mockito.verify(studentMapper).toDto(studentList);
+    assertNotNull(result);
+    assertEquals(studentDtoList.size(), result.size());
+    verify(studentRepository).findAll();
+    verify(studentMapper).toDto(studentList);
   }
 
   @Test
@@ -85,17 +91,17 @@ public class StudentServiceImplTest {
     StudentDto studentDto = new StudentDto();
     Student student = Student.builder().build();
 
-    Mockito.when(studentMapper.toEntity(studentDto)).thenReturn(student);
-    Mockito.when(studentRepository.create(student)).thenReturn(student);
-    Mockito.when(studentMapper.toDto(student)).thenReturn(studentDto);
+    when(studentMapper.toEntity(studentDto)).thenReturn(student);
+    when(studentRepository.create(student)).thenReturn(student);
+    when(studentMapper.toDto(student)).thenReturn(studentDto);
 
     StudentDto result = studentService.createStudent(studentDto);
 
-    Assertions.assertNotNull(result);
-    Mockito.verify(studentDtoValidator).validate(studentDto);
-    Mockito.verify(studentMapper).toEntity(studentDto);
-    Mockito.verify(studentRepository).create(student);
-    Mockito.verify(studentMapper).toDto(student);
+    assertNotNull(result);
+    verify(studentDtoValidator).validate(studentDto);
+    verify(studentMapper).toEntity(studentDto);
+    verify(studentRepository).create(student);
+    verify(studentMapper).toDto(student);
   }
 
   @Test
@@ -103,30 +109,30 @@ public class StudentServiceImplTest {
     StudentDto studentDto = new StudentDto();
     studentDto.setId(1L);
 
-    Mockito.when(studentRepository.findById(studentDto.getId())).thenReturn(Optional.empty());
+    when(studentRepository.findById(studentDto.getId())).thenReturn(Optional.empty());
 
     EntityNotFoundException exception =
-        Assertions.assertThrows(
+        assertThrows(
             EntityNotFoundException.class, () -> studentService.updateStudent(studentDto));
 
-    Assertions.assertEquals("Student with id 1 not found", exception.getMessage());
-    Mockito.verify(studentDtoValidator).validate(studentDto);
-    Mockito.verify(studentRepository).findById(studentDto.getId());
-    Mockito.verifyNoMoreInteractions(studentRepository);
+    assertEquals("Student with id 1 not found", exception.getMessage());
+    verify(studentDtoValidator).validate(studentDto);
+    verify(studentRepository).findById(studentDto.getId());
+    verifyNoMoreInteractions(studentRepository);
   }
 
   @Test
   void testDeleteStudent_ShouldThrowException_WhenStudentNotFound() {
     long studentId = 1L;
 
-    Mockito.when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
+    when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
     EntityNotFoundException exception =
-        Assertions.assertThrows(
+        assertThrows(
             EntityNotFoundException.class, () -> studentService.deleteStudent(studentId));
 
-    Assertions.assertEquals("Student with id 1 not found", exception.getMessage());
-    Mockito.verify(studentRepository).findById(studentId);
-    Mockito.verifyNoMoreInteractions(studentRepository);
+    assertEquals("Student with id 1 not found", exception.getMessage());
+    verify(studentRepository).findById(studentId);
+    verifyNoMoreInteractions(studentRepository);
   }
 }
