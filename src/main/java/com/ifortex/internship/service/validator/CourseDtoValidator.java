@@ -4,8 +4,8 @@ import com.ifortex.internship.dto.CourseDto;
 import com.ifortex.internship.dto.StudentDto;
 import com.ifortex.internship.exception.CourseHasAlreadyStartedException;
 import com.ifortex.internship.exception.CourseIsFullException;
-import com.ifortex.internship.exception.enums.ErrorCode;
 import com.ifortex.internship.exception.InvalidRequestDataException;
+import com.ifortex.internship.exception.enums.ErrorCode;
 import com.ifortex.internship.model.Course;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,6 +26,7 @@ public class CourseDtoValidator {
 
   public void validateForCreate(CourseDto courseDto) {
     validateName(courseDto.getName());
+    validateDescription(courseDto.getDescription());
     validatePrice(courseDto.getPrice());
     validateDuration(courseDto.getDuration());
     validateIsOpenForCreate(courseDto.getIsOpen());
@@ -74,6 +75,14 @@ public class CourseDtoValidator {
     }
   }
 
+  private void validateDescription(String description) {
+    boolean isDescriptionInvalid = description == null;
+    if (isDescriptionInvalid) {
+      throw new InvalidRequestDataException(
+          ErrorCode.INVALID_COURSE_REQUEST_DATA, "Invalid course description");
+    }
+  }
+
   private void validatePrice(BigDecimal price) {
     boolean isPriceInvalid = price == null || price.doubleValue() < MIN_PRICE;
     if (isPriceInvalid) {
@@ -82,8 +91,9 @@ public class CourseDtoValidator {
     }
   }
 
-  private void validateDuration(int duration) {
-    boolean isDurationInvalid = duration < MIN_DURATION;
+  private void validateDuration(Integer duration) {
+    boolean isDurationProvided = duration != null;
+    boolean isDurationInvalid = !isDurationProvided || duration < MIN_DURATION;
     if (isDurationInvalid) {
       throw new InvalidRequestDataException(
           ErrorCode.INVALID_COURSE_REQUEST_DATA, "Invalid course duration");
@@ -103,7 +113,7 @@ public class CourseDtoValidator {
   }
 
   private void validateStartDateForCreate(LocalDateTime date) {
-    boolean isStartDateInvalid = date == null || date.toLocalDate().isBefore(LocalDate.now());
+    boolean isStartDateInvalid = date == null || !date.toLocalDate().isAfter(LocalDate.now());
     if (isStartDateInvalid) {
       throw new InvalidRequestDataException(
           ErrorCode.INVALID_COURSE_REQUEST_DATA, "Invalid course start date");

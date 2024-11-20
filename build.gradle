@@ -21,6 +21,9 @@ ext {
     lombokVersion = '1.18.34'
     loggerVersion = '1.5.12'
     jakartaValidationVersion = '3.1.0'
+    junitVersion = '5.11.3'
+    mockitoVersion = '5.14.2'
+    janinoVersion = '3.1.12'
 }
 
 dependencies {
@@ -31,6 +34,7 @@ dependencies {
     implementation "org.postgresql:postgresql:$postgresqlDriverVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
     implementation "ch.qos.logback:logback-classic:$loggerVersion"
+    implementation "org.codehaus.janino:janino:$janinoVersion"
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:$jakartaServletApiVersion"
     compileOnly "org.projectlombok:lombok:$lombokVersion"
@@ -38,6 +42,11 @@ dependencies {
     runtimeOnly "org.flywaydb:flyway-database-postgresql:$flywayVersion"
 
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
+
 }
 
 test {

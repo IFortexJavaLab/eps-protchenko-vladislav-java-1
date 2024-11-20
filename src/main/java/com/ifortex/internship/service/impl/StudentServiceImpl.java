@@ -32,7 +32,7 @@ public class StudentServiceImpl implements StudentService {
                 () ->
                     new EntityNotFoundException(
                         ErrorCode.STUDENT_NOT_FOUND,
-                        String.format("Student with id=%d not found", id))));
+                        String.format("Student with id %s not found", id))));
   }
 
   @Override
@@ -55,7 +55,7 @@ public class StudentServiceImpl implements StudentService {
     if (studentRepository.findById(studentDto.getId()).isEmpty()) {
       throw new EntityNotFoundException(
           ErrorCode.STUDENT_NOT_FOUND,
-          String.format("Student with id=%d not found", studentDto.getId()));
+          String.format("Student with id %s not found", studentDto.getId()));
     }
     studentRepository.update(studentMapper.toEntity(studentDto));
     return studentDto;
@@ -66,7 +66,7 @@ public class StudentServiceImpl implements StudentService {
   public void deleteStudent(long id) {
     if (studentRepository.findById(id).isEmpty()) {
       throw new EntityNotFoundException(
-          ErrorCode.STUDENT_NOT_FOUND, String.format("Student with id=%d not found", id));
+          ErrorCode.STUDENT_NOT_FOUND, String.format("Student with id %s not found", id));
     }
     studentRepository.delete(id);
   }
